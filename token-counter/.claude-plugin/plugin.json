@@ -1,0 +1,6 @@
+{
+  "name": "token-counter",
+  "version": "0.1.0",
+  "description": "Shows the session's token usage live in the status line, plus a /tokens command",
+  "types": "./types/index.d.ts"
+}
