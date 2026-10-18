@@ -1,6 +1,6 @@
 # claude-mods
 
-Meine Mods für Claude Code, gebündelt als Marketplace. Jeder Mod ist ein eigenes Plugin und kann einzeln installiert werden.
+Meine Mods für Claude Code, gebündelt als Marketplace. Jeder Eintrag ist ein eigenes Plugin und kann einzeln installiert werden.
 
 ## Mods
 
@@ -8,6 +8,7 @@ Meine Mods für Claude Code, gebündelt als Marketplace. Jeder Mod ist ein eigen
 | --- | --- |
 | [token-counter](token-counter/) | Dashboard über dem Prompt (Kontext, Limits, Planer vs. Umsetzer) mit Empfehlung, wann komprimiert oder gewechselt werden sollte |
 | [team-delegate](team-delegate/) | Planer/Umsetzer: der Chat plant, ein günstigeres Modell setzt einzelne Schritte um |
+| [skills-collection](skills-collection/) | Skills: `performance-workflow` (schneller Code nach Messung) und `test-first` (erst Test, dann Code) |
 
 ## Installation
 

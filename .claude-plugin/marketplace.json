@@ -11,6 +11,10 @@
     {
       "name": "team-delegate",
       "source": "./team-delegate"
+    },
+    {
+      "name": "skills-collection",
+      "source": "./skills-collection"
     }
   ]
 }
