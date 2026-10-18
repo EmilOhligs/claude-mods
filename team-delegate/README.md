@@ -1,10 +1,12 @@
-# team-delegate (Claude Code Mod)
+# team-delegate (Claude Code Mod) v0.2
 
 Planer/Umsetzer in einem Chat: der Chat (z. B. auf Opus) plant, ein günstigeres Modell setzt einzelne Schritte um.
 
 ## Wie es funktioniert
 - Beim Start registriert der Mod den Agent-Typ `team-delegate:umsetzer` (eigenes Modell, eigener System-Prompt, begrenzte Tools).
 - Über `prompt.compose` bekommt der Chat zusätzlich die Rolle „Planer“: Aufgabe zerlegen, Schritte per Agent-Tool an den Umsetzer geben, Ergebnisse selbst prüfen.
+- **Sparmodus:** Bei Limit ≥ 75 % läuft der Umsetzer eine Stufe günstiger (opus → sonnet → haiku, ab 85 % zwei Stufen), unter 65 % wieder normal. Ein Toast meldet jeden Wechsel.
+- **Kontext-Hinweis:** Ist der Kontext des Planers ≥ 70 % voll, bekommt er im System-Prompt die Anweisung, knapp zu bleiben, mehr abzugeben und `/compact` oder einen neuen Chat vorzuschlagen.
 - Ein Toast bestätigt beim Start, welches Modell der Umsetzer nutzt.
 
 ## Einstellungen (userConfig)
@@ -12,8 +14,11 @@ Planer/Umsetzer in einem Chat: der Chat (z. B. auf Opus) plant, ein günstigeres
 - `canEdit`: Umsetzer darf Dateien ändern (Standard: an). Aus = nur lesen und Vorschläge liefern.
 
 ## Dateien
-- `hooks/register.ts` – Logik (`session.start`, `prompt.compose`)
-- `hooks/register.test.ts` – Tests für die Prompt-Texte
+- `hooks/register.ts` – Logik (`session.start`, `session.measure`, `prompt.compose`)
+- `hooks/register.test.ts` – Tests für Prompts, Modellleiter und Sparstufen
+
+## Zusammenspiel
+Das Dashboard aus `token-counter` zeigt Planer und Umsetzer getrennt und empfiehlt, wann zu delegieren oder zu komprimieren ist. Beide nutzen dieselben Schwellen.
 
 ## Offen
 - Nicht in einer echten Session ausprobiert; `claude plugin validate`/`test` nicht gelaufen (`tsc` sauber).

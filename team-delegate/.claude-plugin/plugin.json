@@ -1,6 +1,6 @@
 {
   "name": "team-delegate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Planner/Umsetzer: this chat plans, a cheaper model implements the delegated steps",
   "userConfig": {
     "workerModel": {
