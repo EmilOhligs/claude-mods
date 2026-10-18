@@ -1,0 +1,20 @@
+{
+  "name": "team-delegate",
+  "version": "0.1.0",
+  "description": "Planner/Umsetzer: this chat plans, a cheaper model implements the delegated steps",
+  "userConfig": {
+    "workerModel": {
+      "type": "string",
+      "title": "Umsetzer-Modell",
+      "description": "Model of the implementer agent",
+      "default": "sonnet",
+      "options": ["haiku", "sonnet", "opus"]
+    },
+    "canEdit": {
+      "type": "boolean",
+      "title": "Umsetzer darf Dateien ändern",
+      "description": "Off: the implementer only reads and returns proposals",
+      "default": true
+    }
+  }
+}

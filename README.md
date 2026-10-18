@@ -7,6 +7,7 @@ Meine Mods für Claude Code, gebündelt als Marketplace. Jeder Mod ist ein eigen
 | Mod | Was er macht |
 | --- | --- |
 | [token-counter](token-counter/) | Token-Verbrauch live in der Statuszeile, plus `/tokens` |
+| [team-delegate](team-delegate/) | Planer/Umsetzer: der Chat plant, ein günstigeres Modell setzt einzelne Schritte um |
 
 ## Installation
 

@@ -1,7 +1,16 @@
 {
   "name": "claude-mods",
-  "owner": { "name": "EmilOhligs" },
+  "owner": {
+    "name": "EmilOhligs"
+  },
   "plugins": [
-    { "name": "token-counter", "source": "./token-counter" }
+    {
+      "name": "token-counter",
+      "source": "./token-counter"
+    },
+    {
+      "name": "team-delegate",
+      "source": "./team-delegate"
+    }
   ]
 }
