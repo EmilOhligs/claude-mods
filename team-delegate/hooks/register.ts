@@ -1,14 +1,10 @@
-import type { EngineInterface, PluginOptions, Register } from 'claude-code'
+import type { PluginOptions, Register } from 'claude-code'
 
 export const AGENT = 'umsetzer'
 
 const READ_TOOLS = ['Read', 'Grep', 'Glob']
 const WRITE_TOOLS = ['Edit', 'Write', 'Bash', 'NotebookEdit']
 
-/** Same thresholds as token-counter's advice, so both mods agree. */
-const SAVE_AT = 75
-const SAVE_HARD_AT = 85
-const RELAX_BELOW = 65
 const CONTEXT_TIGHT_AT = 70
 
 export const workerPrompt = (canEdit: boolean): string =>
@@ -36,58 +32,30 @@ export const plannerSection = (type: string, contextPercent?: number): string =>
       : []),
   ].join('\n')
 
-/** Models the worker may run on, best first, for each configured base. */
-export const ladder = (base: string): [string, string, string] =>
-  base === 'opus' ? ['opus', 'sonnet', 'haiku']
-  : base === 'sonnet' ? ['sonnet', 'haiku', 'haiku']
-  : [base, base, base]
-
-/** Saving level 0..2 from the highest rate-limit use; hysteresis keeps it from flapping. */
-export const saveLevel = (previous: number, limitPercent: number): number =>
-  limitPercent >= SAVE_HARD_AT ? 2
-  : limitPercent >= SAVE_AT ? (previous === 2 ? 2 : 1)
-  : limitPercent < RELAX_BELOW ? 0
-  : previous
-
 const asString = (v: PluginOptions[string] | undefined, fallback: string): string =>
   typeof v === 'string' ? v : fallback
 
 export const register: Register = (on, options) => {
-  const base = asString(options.workerModel, 'sonnet')
+  const model = asString(options.workerModel, 'sonnet')
   const canEdit = options.canEdit !== false
-  let level = 0
   let contextPercent: number | undefined
 
-  const define = ($: EngineInterface) =>
-    $.agent.register({
+  on('session.start', async ($, e, next) => {
+    const { agent } = await $.agent.register({
       name: AGENT,
       description:
         'Setzt genau einen vom Planer klar beschriebenen Schritt um (Code ändern, Dateien anlegen). Nicht für Planung oder offene Fragen.',
       prompt: workerPrompt(canEdit),
       tools: canEdit ? [...READ_TOOLS, ...WRITE_TOOLS] : READ_TOOLS,
-      model: ladder(base)[level] ?? base,
+      model,
     })
-
-  on('session.start', async ($, e, next) => {
-    const { agent } = await define($)
-    $.ui.toast(`Planer/Umsetzer aktiv: ${agent} (${ladder(base)[level]})`)
+    $.ui.toast(`Planer/Umsetzer aktiv: ${agent} (${model})`)
 
     return next(e)
   })
 
-  on('session.measure', async ($, e, next) => {
+  on('session.measure', (_$, e, next) => {
     contextPercent = e.context.percent ?? contextPercent
-    const limit = e.rateLimits.reduce((top, l) => Math.max(top, l.percentUsed), 0)
-    const wanted = saveLevel(level, limit)
-    if (wanted !== level) {
-      level = wanted
-      await define($)
-      $.ui.toast(
-        level === 0
-          ? `Umsetzer wieder auf ${ladder(base)[0]} (Limit ${Math.round(limit)} %)`
-          : `Sparmodus: Umsetzer läuft jetzt auf ${ladder(base)[level]} (Limit ${Math.round(limit)} %)`,
-      )
-    }
 
     return next(e)
   })

@@ -10,17 +10,17 @@ Kleines Dashboard über dem Prompt plus Empfehlung, wann man etwas ändern sollt
 
 ## Empfehlung (höchste Dringlichkeit zuerst)
 1. Kontext ≥ 90 %: `/compact` oder neuer Chat.
-2. Limit ≥ 90 %: günstigeres Modell oder pausieren.
+2. Limit ≥ 90 %: Umsetzung abgeben, kurz halten oder pausieren (kein automatischer Modellwechsel).
 3. Kontext ≥ 75 %: nach dem Schritt `/compact` oder neuer Chat.
 4. Limit ≥ 75 %: Umsetzung an `team-delegate:umsetzer` abgeben.
 5. Viel Output im teuren Hauptmodell (Opus), kaum delegiert: Schritte delegieren.
-Ein Modellwechsel mitten in der Arbeit kostet den warmen Prompt-Cache, deshalb besser zwischen Aufgaben wechseln. Warn-/Alarmstufen kommen zusätzlich als Toast.
+Warn-/Alarmstufen kommen zusätzlich als Toast.
 
 ## Befehl
 `/tokens` gibt den Bericht als Text aus; `/tokens hide`, `/tokens show`, `/tokens details` steuern das Band.
 
 ## Zusammenspiel mit team-delegate
-Dieselben Schwellen (75 % / 85 %). team-delegate schaltet bei hohem Limit den Umsetzer auf ein günstigeres Modell (Sparmodus) und warnt den Planer bei vollem Kontext. Beide Mods lesen die Zahlen unabhängig voneinander, keiner braucht den anderen.
+team-delegate lässt den Umsetzer immer auf dem eingestellten Modell (Standard Sonnet) und warnt den Planer bei vollem Kontext. Beide Mods lesen die Zahlen unabhängig voneinander, keiner braucht den anderen.
 
 ## Dateien
 - `hooks/model.ts` – Logik (Zählen, Empfehlung, Texte), ohne Engine-Abhängigkeit

@@ -87,7 +87,7 @@ export const recommend = (stats: Stats): Recommendation => {
     return { level: 'alert', text: 'Kontext fast voll: jetzt /compact oder neuen Chat starten (Plan vorher in eine Datei).' }
   }
   if (limit && limit.percentUsed >= 90) {
-    return { level: 'alert', text: `Limit ${limitLabel(limit.kind)} bei ${Math.round(limit.percentUsed)} %: auf ein günstigeres Modell wechseln (/model sonnet) oder pausieren.` }
+    return { level: 'alert', text: `Limit ${limitLabel(limit.kind)} bei ${Math.round(limit.percentUsed)} %: Umsetzung an team-delegate:umsetzer abgeben, kurz halten oder pausieren.` }
   }
   if (ctx !== undefined && ctx >= 75) {
     return { level: 'warn', text: 'Kontext wird voll: nach dem aktuellen Schritt /compact oder neuer Chat. Modellwechsel jetzt kostet Cache.' }
