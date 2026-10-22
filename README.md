@@ -9,6 +9,7 @@ Meine Mods für Claude Code, gebündelt als Marketplace. Jeder Eintrag ist ein e
 | [token-counter](token-counter/) | Dashboard über dem Prompt (Kontext, Limits, Planer vs. Umsetzer) mit Empfehlung, wann komprimiert oder gewechselt werden sollte |
 | [team-delegate](team-delegate/) | Planer/Umsetzer: der Chat plant, ein günstigeres Modell setzt einzelne Schritte um |
 | [skills-collection](skills-collection/) | Skills: `performance-workflow` (schneller Code nach Messung) und `test-first` (erst Test, dann Code) |
+| [tdd-guard](tdd-guard/) | Erzwingt Test-first in jedem Git-Projekt: Code erst nach rotem Test, der Umsetzer ändert keine Tests, Zug und Commit nur mit grüner Suite |
 
 ## Installation
 
