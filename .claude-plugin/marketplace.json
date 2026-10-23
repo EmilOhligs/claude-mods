@@ -19,6 +19,10 @@
     {
       "name": "tdd-guard",
       "source": "./tdd-guard"
+    },
+    {
+      "name": "lean-code",
+      "source": "./lean-code"
     }
   ]
 }

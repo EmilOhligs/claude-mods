@@ -10,6 +10,7 @@ Meine Mods für Claude Code, gebündelt als Marketplace. Jeder Eintrag ist ein e
 | [team-delegate](team-delegate/) | Planer/Umsetzer: der Chat plant, ein günstigeres Modell setzt einzelne Schritte um |
 | [skills-collection](skills-collection/) | Skills: `performance-workflow` (schneller Code nach Messung) und `test-first` (erst Test, dann Code) |
 | [tdd-guard](tdd-guard/) | Erzwingt Test-first in jedem Git-Projekt: Code erst nach rotem Test, der Umsetzer ändert keine Tests, Zug und Commit nur mit grüner Suite |
+| [lean-code](lean-code/) | Schlanker Code als Dauerregel (nach Ponytail): kleinste vollständige Änderung, kein ungefragter Code; Tests, Sicherheit und Validierung werden nie gekürzt. Gilt auch für den Umsetzer |
 
 ## Installation
 

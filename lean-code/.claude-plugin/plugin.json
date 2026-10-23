@@ -1,0 +1,26 @@
+{
+  "name": "lean-code",
+  "version": "0.1.0",
+  "description": "Always-on lean coding rules (after Ponytail): the smallest complete change, no unrequested code, never cut tests, security or validation",
+  "userConfig": {
+    "level": {
+      "type": "string",
+      "title": "Stufe",
+      "description": "lite: bauen, was verlangt ist, kleinere Variante nur nennen; full: Regeln anwenden (Standard); ultra: zusätzlich die Anfrage selbst hinterfragen; off: aus",
+      "default": "full",
+      "options": [
+        "lite",
+        "full",
+        "ultra",
+        "off"
+      ]
+    },
+    "subagents": {
+      "type": "boolean",
+      "title": "Auch für Subagenten",
+      "description": "Regeln an Subagenten anhängen, die Code schreiben können (z. B. den Umsetzer); Explore und Plan bleiben ausgenommen",
+      "default": true
+    }
+  },
+  "license": "MIT"
+}
