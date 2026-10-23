@@ -126,3 +126,19 @@ export const report = (stats: Stats): string => {
     `Empfehlung: ${rec.text}`,
   ].join('\n')
 }
+
+export type LogBase = { at: string; session: string; project: string; durationMs: number }
+
+/** One JSONL line per turn; Claude copies these into the Zentrale's runs. */
+export const logLine = (base: LogBase, role: Role, u: Usage, s: Stats): string =>
+  JSON.stringify({
+    ...base,
+    role,
+    model: u.model,
+    input: u.input_tokens,
+    output: u.output_tokens,
+    cacheRead: u.cache_read_input_tokens,
+    cacheWrite: u.cache_creation_input_tokens,
+    contextPercent: s.contextPercent,
+    costUsd: s.costUsd,
+  }) + '\n'

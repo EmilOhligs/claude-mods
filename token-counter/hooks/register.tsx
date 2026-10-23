@@ -2,9 +2,9 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import {
-  EMPTY, addUsage, bar, colorOf, fmt, levelOf, limitLabel, line, readTokens, recommend, report, shortModel, sum,
+  EMPTY, addUsage, bar, colorOf, fmt, levelOf, limitLabel, line, logLine, readTokens, recommend, report, shortModel, sum,
 } from './model'
-import type { Level } from './model'
+import type { Level, Role, Usage } from './model'
 
 const stats = atom({ plugin: 'token-counter', key: 'stats' } as const, EMPTY)
 const isHidden = atom({ plugin: 'token-counter', key: 'isHidden' } as const, false)
@@ -18,6 +18,16 @@ const refresh = async ($: EngineInterface) => {
   const rec = recommend(s)
   if (rec.level !== lastLevel && (rec.level === 'warn' || rec.level === 'alert')) $.ui.toast(rec.text)
   lastLevel = rec.level
+}
+
+// One file per session, so parallel sessions never overwrite each other's lines.
+const writeLog = async ($: EngineInterface, role: Role, usage: Usage, durationMs: number) => {
+  const [home, session, cwd] = await Promise.all([$.env.get('HOME'), $.session.id(), $.session.cwd()])
+  if (home === undefined) return
+  const path = `${home}/.claude/token-counter/log/${session}.jsonl`
+  const old = (await $.fs.exists(path)) ? await $.fs.read(path) : ''
+  const base = { at: new Date().toISOString(), session, project: cwd.split('/').at(-1) ?? cwd, durationMs }
+  await $.fs.write(path, old + logLine(base, role, usage, await read($, stats)))
 }
 
 export const register: Register = on => {
@@ -34,8 +44,10 @@ export const register: Register = on => {
     const done = await next(e)
     const usage = e.usage
     if (usage) {
-      await update($, stats, s => addUsage(s, e.agentId === undefined ? 'main' : 'agent', usage))
+      const role = e.agentId === undefined ? 'main' : 'agent'
+      await update($, stats, s => addUsage(s, role, usage))
       await refresh($)
+      await writeLog($, role, usage, e.durationMs).catch(err => $.ui.log(`token-counter: log not written (${err})`))
     }
     return done
   })

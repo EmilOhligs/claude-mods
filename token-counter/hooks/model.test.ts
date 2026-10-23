@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { EMPTY, addUsage, bar, fmt, recommend, sum } from './model'
+import { EMPTY, addUsage, bar, fmt, logLine, recommend, sum } from './model'
 import type { Stats } from '../types'
 
 const u = (model: string, out: number) => ({
@@ -41,4 +41,14 @@ test('recommend suggests delegating when opus does all the work', () => {
   expect(recommend(s).level).toBe('info')
   s = addUsage(s, 'agent', u('claude-sonnet-5-5', 20_000))
   expect(recommend(s).level).toBe('ok')
+})
+
+test('logLine writes one JSON line per turn for the Zentrale', () => {
+  const s: Stats = { ...EMPTY, contextPercent: 41, costUsd: 1.5 }
+  const text = logLine({ at: '2026-10-23T12:00:00Z', session: 's1', project: 'claude-mods', durationMs: 900 }, 'agent', u('claude-sonnet-5-5', 200), s)
+  expect(text.endsWith('\n')).toBe(true)
+  expect(JSON.parse(text)).toEqual({
+    at: '2026-10-23T12:00:00Z', session: 's1', project: 'claude-mods', role: 'agent', model: 'claude-sonnet-5-5',
+    input: 100, output: 200, cacheRead: 1000, cacheWrite: 0, durationMs: 900, contextPercent: 41, costUsd: 1.5,
+  })
 })
