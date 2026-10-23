@@ -31,6 +31,7 @@ team-delegate lässt den Umsetzer immer auf dem eingestellten Modell (Standard S
 - `hooks/model.test.ts` – Tests für die Logik
 - `hooks/runs.ts`, `hooks/runs.test.ts` – Log zu Läufen der Zentrale, mit Tests
 - `scripts/runs.ts` – liest die Logs und schreibt die Läufe (Node 23+)
+- `scripts/tokens.ts` – liest die Logs und schreibt eine Zeile je Session für den Reiter Verbrauch der Zentrale
 - `types/index.d.ts` – State-Vertrag
 
 ## Offen

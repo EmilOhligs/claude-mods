@@ -42,3 +42,26 @@ export const mergeRuns = (logText: string, runs: Run[]): Run[] => {
   const ids = new Set(made.map(r => r.run))
   return [...runs.filter(r => !ids.has(r.run)), ...made].sort((a, b) => b.at.localeCompare(a.at))
 }
+
+/** A row of the Zentrale's `tokens` dataset, the Verbrauch tab. */
+export type SessionTokens = {
+  session: string; updated: string; project: string; model: string
+  planerIn: number; planerOut: number; umsetzerIn: number; umsetzerOut: number; turns: number; costUsd: number
+}
+
+/** Sums log lines into one row per session; read counts cache, cost is the session's latest total. */
+export const sessionTokens = (logText: string): SessionTokens[] => {
+  const rows = new Map<string, SessionTokens>()
+  const lines = logText.split('\n').filter(Boolean).map(t => JSON.parse(t) as Line).sort((a, b) => a.at.localeCompare(b.at))
+  for (const l of lines) {
+    const r = rows.get(l.session) ?? { session: l.session, updated: l.at, project: l.project, model: l.model, planerIn: 0, planerOut: 0, umsetzerIn: 0, umsetzerOut: 0, turns: 0, costUsd: 0 }
+    const who = l.role === 'main' ? 'planer' : 'umsetzer'
+    r[`${who}In`] += l.input + l.cacheRead + l.cacheWrite
+    r[`${who}Out`] += l.output
+    if (l.role === 'main') r.turns += 1
+    r.updated = l.at
+    r.costUsd = l.costUsd ?? r.costUsd
+    rows.set(l.session, r)
+  }
+  return [...rows.values()]
+}

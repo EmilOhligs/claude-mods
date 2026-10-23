@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { mergeRuns } from './runs'
+import { mergeRuns, sessionTokens } from './runs'
 
 const line = (at: string, role: string, output: number, costUsd: number) =>
   JSON.stringify({
@@ -33,4 +33,11 @@ test('mergeRuns replaces a run it made before and keeps its corrected project', 
   const twice = mergeRuns(log, once)
   expect(twice.length).toBe(3)
   expect(twice.find(r => r.run === 'cc-abcdef12-main')?.project).toBe('fixed')
+})
+
+test('sessionTokens sums a session into one row for the Verbrauch tab', () => {
+  expect(sessionTokens(log)).toEqual([{
+    session: 'abcdef1234', updated: '2026-10-23T12:02:00.000Z', project: 'claude-mods', model: 'claude-opus-5-5',
+    planerIn: 2004, planerOut: 1200, umsetzerIn: 1002, umsetzerOut: 200, turns: 2, costUsd: 2.25,
+  }])
 })
