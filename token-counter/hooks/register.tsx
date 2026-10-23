@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import {
-  EMPTY, addUsage, bar, colorOf, fmt, levelOf, limitLabel, line, logLine, readTokens, recommend, report, shortModel, sum,
+  EMPTY, addUsage, bar, colorOf, fmt, levelOf, limitLabel, line, logLine, readTokens, recommend, report, resetIso, shortModel, sum,
 } from './model'
 import type { Level, Role, Usage } from './model'
 
@@ -56,7 +56,7 @@ export const register: Register = on => {
     await update($, stats, s => ({
       ...s,
       contextPercent: e.context.percent ?? s.contextPercent,
-      rateLimits: e.rateLimits.map(l => ({ kind: l.kind, percentUsed: l.percentUsed })),
+      rateLimits: e.rateLimits.map(l => ({ kind: l.kind, percentUsed: l.percentUsed, resetsAt: resetIso(l) })),
       costUsd: e.cost?.usd ?? s.costUsd,
     }))
     await refresh($)

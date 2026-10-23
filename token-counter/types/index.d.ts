@@ -6,7 +6,7 @@ export type Bucket = {
   turns: number
 }
 
-export type RateLimit = { kind: string; percentUsed: number }
+export type RateLimit = { kind: string; percentUsed: number; /** ISO time the window resets, when Claude Code reports it. */ resetsAt?: string }
 
 export type Stats = {
   /** Token buckets by `<role>|<model>`; role is `main` or `agent`. */
