@@ -20,7 +20,7 @@ Warn-/Alarmstufen kommen zusätzlich als Toast.
 `/tokens` gibt den Bericht als Text aus; `/tokens hide`, `/tokens show`, `/tokens details` steuern das Band.
 
 ## Log für die Zentrale
-Nach jedem Turn hängt der Mod eine JSON-Zeile an `~/.claude/token-counter/log/<session-id>.jsonl` an: Zeit, Session, Projekt (Ordnername), Rolle (`main`/`agent`), Modell, Tokens (input, output, cacheRead, cacheWrite), Dauer, Kontext-% und Kosten. Eine Datei pro Session, damit parallele Sessions sich nicht überschreiben. Claude überträgt die Zeilen in die Läufe der Zentrale. Klappt das Schreiben nicht, steht eine Zeile im Transkript; die Anzeige läuft weiter.
+Nach jedem Turn hängt der Mod eine JSON-Zeile an `~/.claude/token-counter/log/<session-id>.jsonl` an: Zeit, Session, Projekt (Ordnername), Rolle (`main`/`agent`), Modell, Tokens (input, output, cacheRead, cacheWrite), Dauer, Kontext-% und Kosten. Eine Datei pro Session, damit parallele Sessions sich nicht überschreiben. Claude überträgt die Zeilen in die Läufe der Zentrale: `node token-counter/scripts/runs.ts <runs.json> <neu.json>` fasst alle Logs je Session und Rolle zu einem Lauf zusammen (`cc-<session>-main` bzw. `-agent`). Ein schon übernommener Lauf wird ersetzt und behält sein Projekt, damit eine Korrektur von Hand bleibt. Die neue Datei lädt Claude in die Zentrale hoch. Klappt das Schreiben nicht, steht eine Zeile im Transkript; die Anzeige läuft weiter.
 
 ## Zusammenspiel mit team-delegate
 team-delegate lässt den Umsetzer immer auf dem eingestellten Modell (Standard Sonnet) und warnt den Planer bei vollem Kontext. Beide Mods lesen die Zahlen unabhängig voneinander, keiner braucht den anderen.
@@ -29,6 +29,8 @@ team-delegate lässt den Umsetzer immer auf dem eingestellten Modell (Standard S
 - `hooks/model.ts` – Logik (Zählen, Empfehlung, Texte), ohne Engine-Abhängigkeit
 - `hooks/register.tsx` – Hooks, Befehl, Band
 - `hooks/model.test.ts` – Tests für die Logik
+- `hooks/runs.ts`, `hooks/runs.test.ts` – Log zu Läufen der Zentrale, mit Tests
+- `scripts/runs.ts` – liest die Logs und schreibt die Läufe (Node 23+)
 - `types/index.d.ts` – State-Vertrag
 
 ## Offen
