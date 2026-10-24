@@ -1,4 +1,4 @@
-# token-counter (Claude Code Mod) v0.3
+# token-counter (Claude Code Mod) v0.4
 
 Kleines Dashboard über dem Prompt plus Empfehlung, wann man etwas ändern sollte.
 
@@ -20,7 +20,7 @@ Warn-/Alarmstufen kommen zusätzlich als Toast.
 `/tokens` gibt den Bericht als Text aus; `/tokens hide`, `/tokens show`, `/tokens details` steuern das Band.
 
 ## Log für die Zentrale
-Nach jedem Turn hängt der Mod eine JSON-Zeile an `~/.claude/token-counter/log/<session-id>.jsonl` an: Zeit, Session, Projekt (Ordnername), Rolle (`main`/`agent`), Modell, Tokens (input, output, cacheRead, cacheWrite), Dauer, Kontext-% und Kosten. Eine Datei pro Session, damit parallele Sessions sich nicht überschreiben. Claude überträgt die Zeilen in die Läufe der Zentrale: `node token-counter/scripts/runs.ts <runs.json> <neu.json>` fasst alle Logs je Session und Rolle zu einem Lauf zusammen (`cc-<session>-main` bzw. `-agent`). Ein schon übernommener Lauf wird ersetzt und behält sein Projekt, damit eine Korrektur von Hand bleibt. Die neue Datei lädt Claude in die Zentrale hoch. Klappt das Schreiben nicht, steht eine Zeile im Transkript; die Anzeige läuft weiter.
+Nach jedem Turn hängt der Mod eine JSON-Zeile an `~/.claude/token-counter/log/<session-id>.jsonl` an: Zeit, Session, Projekt (Ordnername), Rolle (`main`/`agent`), Modell, Tokens (input, output, cacheRead, cacheWrite), Dauer, Kontext-%, Kosten und – sobald Claude Code sie meldet – die Limits (`rateLimits`: `five_hour`/`seven_day` mit `percentUsed` und `resetsAt`). Daraus schreibt die Aufgabe „Zentrale – Token-Läufe“ den letzten Messwert nach `ops/usage` der Zentrale (Nutzungsgrenzen des Organisators). Eine Datei pro Session, damit parallele Sessions sich nicht überschreiben. Claude überträgt die Zeilen in die Läufe der Zentrale: `node token-counter/scripts/runs.ts <runs.json> <neu.json>` fasst alle Logs je Session und Rolle zu einem Lauf zusammen (`cc-<session>-main` bzw. `-agent`). Ein schon übernommener Lauf wird ersetzt und behält sein Projekt, damit eine Korrektur von Hand bleibt. Die neue Datei lädt Claude in die Zentrale hoch. Klappt das Schreiben nicht, steht eine Zeile im Transkript; die Anzeige läuft weiter.
 
 ## Zusammenspiel mit team-delegate
 team-delegate lässt den Umsetzer immer auf dem eingestellten Modell (Standard Sonnet) und warnt den Planer bei vollem Kontext. Beide Mods lesen die Zahlen unabhängig voneinander, keiner braucht den anderen.

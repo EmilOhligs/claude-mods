@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { EMPTY, addUsage, bar, fmt, logLine, recommend, sum } from './model'
+import { EMPTY, addUsage, bar, fmt, logLine, recommend, resetIso, sum } from './model'
 import type { Stats } from '../types'
 
 const u = (model: string, out: number) => ({
@@ -51,4 +51,17 @@ test('logLine writes one JSON line per turn for the Zentrale', () => {
     at: '2026-10-23T12:00:00Z', session: 's1', project: 'claude-mods', role: 'agent', model: 'claude-sonnet-5-5',
     input: 100, output: 200, cacheRead: 1000, cacheWrite: 0, durationMs: 900, contextPercent: 41, costUsd: 1.5,
   })
+})
+
+test('logLine carries the 5-h and weekly limits when measured', () => {
+  const s: Stats = { ...EMPTY, rateLimits: [{ kind: 'five_hour', percentUsed: 42, resetsAt: '2026-10-24T03:00:00.000Z' }, { kind: 'seven_day', percentUsed: 61 }] }
+  const line = JSON.parse(logLine({ at: '2026-10-24T00:00:00Z', session: 's1', project: 'p', durationMs: 1 }, 'main', u('claude-opus-5-5', 1), s))
+  expect(line.rateLimits).toEqual(s.rateLimits)
+})
+
+test('resetIso accepts text, seconds and milliseconds', () => {
+  expect(resetIso({ resetsAt: '2026-10-24T03:00:00Z' })).toBe('2026-10-24T03:00:00Z')
+  expect(resetIso({ resetsAt: 1792800000 })).toBe('2026-10-24T00:00:00.000Z')
+  expect(resetIso({ resetsAt: 1792800000000 })).toBe('2026-10-24T00:00:00.000Z')
+  expect(resetIso({ kind: 'five_hour' })).toBe(undefined)
 })

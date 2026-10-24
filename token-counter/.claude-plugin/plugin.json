@@ -1,6 +1,6 @@
 {
   "name": "token-counter",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Token dashboard above the prompt (context, limits, planner vs implementer) with advice on when to compact or switch models",
   "types": "./types/index.d.ts"
 }

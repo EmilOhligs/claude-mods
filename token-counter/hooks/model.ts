@@ -130,6 +130,14 @@ export const report = (stats: Stats): string => {
 export type LogBase = { at: string; session: string; project: string; durationMs: number }
 
 /** One JSONL line per turn; Claude copies these into the Zentrale's runs. */
+/** Reset time of a limit as ISO text; Claude Code may report it as text or epoch (s or ms). */
+export const resetIso = (limit: object): string | undefined => {
+  const v = 'resetsAt' in limit ? (limit as { resetsAt?: unknown }).resetsAt : undefined
+  if (typeof v === 'string') return v
+  if (typeof v === 'number' && Number.isFinite(v)) return new Date(v < 1e12 ? v * 1000 : v).toISOString()
+  return undefined
+}
+
 export const logLine = (base: LogBase, role: Role, u: Usage, s: Stats): string =>
   JSON.stringify({
     ...base,
@@ -141,4 +149,6 @@ export const logLine = (base: LogBase, role: Role, u: Usage, s: Stats): string =
     cacheWrite: u.cache_creation_input_tokens,
     contextPercent: s.contextPercent,
     costUsd: s.costUsd,
+    // 5-h- und Wochenlimit für die Nutzungsgrenzen der Zentrale (ops/usage); fehlt, solange nicht gemessen
+    rateLimits: s.rateLimits.length > 0 ? s.rateLimits : undefined,
   }) + '\n'
