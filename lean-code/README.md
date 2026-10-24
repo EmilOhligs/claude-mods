@@ -30,3 +30,6 @@ Die Regeln: erst den Umfang klären (Aufrufer, Tests, Fixtures, Konfiguration), 
     claude plugin install lean-code@claude-mods
 
 Danach in einer neuen Session aktiv. Tests: `claude plugin test lean-code`.
+
+## Offen
+- Echte Session 2026-10-24: ok. Die Regeln (Stufe `full`) stehen im System-Prompt des Planers und im Auftrag des Umsetzers.
