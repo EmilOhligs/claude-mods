@@ -5,6 +5,8 @@ import { UMSETZER } from './rules'
 type Repo = {
   /** `git status --porcelain` output; undefined means "not a git repository". */
   porcelain?: string
+  /** `git status --porcelain` output once a tool has run; defaults to `porcelain`. */
+  porcelainAfter?: string
   /** Whether pytest and ruff fail. */
   failing?: boolean
   /** Extra files that exist, relative to /repo. */
@@ -32,9 +34,13 @@ const setup = async ($: any, on: any, repo: Repo = {}) => {
     ...repo.files,
   }
   const ran: string[][] = []
+  let toolRan = false
 
   on('session.start', (_: any, e: any) => ({ cwd: e.cwd }))
-  on('tool.call', () => ({ result: {} }))
+  on('tool.call', () => {
+    toolRan = true
+    return { result: {} }
+  })
   on('classic.Stop', () => ({}))
   on('classic.SubagentStop', () => ({}))
   on('prompt.compose', () => ({ sections: [] }))
@@ -47,7 +53,8 @@ const setup = async ($: any, on: any, repo: Repo = {}) => {
     const argv: string[] = [...e.argv]
     ran.push(argv)
     if (argv[0] === 'git') {
-      return { value: repo.porcelain === undefined ? fail(128, '') : ok(repo.porcelain) }
+      const porcelain = toolRan ? (repo.porcelainAfter ?? repo.porcelain) : repo.porcelain
+      return { value: porcelain === undefined ? fail(128, '') : ok(porcelain) }
     }
     if (argv.includes('pytest')) {
       return {
@@ -199,6 +206,23 @@ test('other shell commands run no checks', async ($, on) => {
   const result = await $.tool.call({ tool: 'Bash', command: 'git status' } as any)
   expect(refusal(result)).toBe(undefined)
   expect(ran.some(argv => argv.includes('pytest'))).toBe(false)
+})
+
+test('a shell command that changes source without a test is refused and stashed', async ($, on) => {
+  const ran = await setup($, on, { porcelain: '', porcelainAfter: ' M src/a.py\n' })
+  const result = await $.tool.call({ tool: 'Bash', command: "sed -i '' s/1/2/ src/a.py" } as any)
+  expect(refusal(result)).toContain('stash')
+  expect(ran.some(argv => argv.includes('stash') && argv.includes('src/a.py'))).toBe(true)
+})
+
+test('a shell command may change source once a test file changed', async ($, on) => {
+  const ran = await setup($, on, {
+    porcelain: ' M tests/test_a.py\n',
+    porcelainAfter: ' M tests/test_a.py\n M src/a.py\n',
+  })
+  const result = await $.tool.call({ tool: 'Bash', command: "sed -i '' s/1/2/ src/a.py" } as any)
+  expect(refusal(result)).toBe(undefined)
+  expect(ran.some(argv => argv.includes('stash'))).toBe(false)
 })
 
 // --- prompt -----------------------------------------------------------------------
