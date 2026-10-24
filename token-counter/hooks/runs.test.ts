@@ -41,3 +41,9 @@ test('sessionTokens sums a session into one row for the Verbrauch tab', () => {
     planerIn: 2004, planerOut: 1200, umsetzerIn: 1002, umsetzerOut: 200, turns: 2, costUsd: 2.25,
   }])
 })
+
+test('sessionTokens names the planner model even when the implementer logged first', () => {
+  const first = JSON.parse(line('2026-10-23T11:59:00.000Z', 'agent', 100, 0.5))
+  const text = JSON.stringify({ ...first, model: 'claude-sonnet-5-5' }) + '\n' + log
+  expect(sessionTokens(text)[0]?.model).toBe('claude-opus-5-5')
+})
