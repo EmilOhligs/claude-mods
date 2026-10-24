@@ -227,6 +227,34 @@ const stopReason = async (
   })
 }
 
+const shellSourceReason = (files: string[], stashed: boolean): string =>
+  `tdd-guard: Quellcode wurde per Shell geändert (${files.join(', ')}), ohne dass ein Test geändert oder neu ist. ${
+    stashed
+      ? 'Die Änderung ist zurückgenommen und in git stash gesichert (git stash list); hole sie mit git stash pop zurück, sobald ein roter Test steht.'
+      : 'git stash ist fehlgeschlagen, die Änderung steht noch in der Arbeitskopie: nimm sie zurück.'
+  } Schreibe zuerst einen roten Test und prüfe, dass er aus dem richtigen Grund fehlschlägt.`
+
+// shortcut: Quelldateien, die schon vor dem Befehl geändert waren, werden nicht erkannt; bei Bedarf Inhalts-Hash statt Pfadliste vergleichen
+const guardShellSource = async (
+  $: Dollar,
+  mode: Mode,
+  run: () => Promise<ToolCallResult>,
+): Promise<ToolCallResult> => {
+  const project = await projectFor($, mode)
+  const before = project && (await gitChanges($, project.root))
+  if (project === undefined || before === undefined || before.some(isTestFile)) return run()
+  const ran = await run()
+  const added = ((await gitChanges($, project.root)) ?? []).filter(
+    path => isSourceFile(path) && !before.includes(path),
+  )
+  if (added.length === 0) return ran
+  if (mode !== 'block') return withContext(ran, shellSourceReason(added, false))
+  // stash, not checkout: a change from e.g. git stash pop or git apply cannot be redone
+  const stash = ['git', 'stash', 'push', '-u', '-m', 'tdd-guard: Shell-Änderung ohne Test', '--', ...added]
+  const stashed = (await runReport($, project.root, stash, GIT_TIMEOUT_MS)).exitCode === 0
+  return { ...ran, isError: true, text: shellSourceReason(added, stashed) }
+}
+
 // --- wiring -------------------------------------------------------------------
 
 export const register: Register = (on, options) => {
@@ -260,7 +288,8 @@ export const register: Register = (on, options) => {
   }).catch(($, e, next) => (next.called || mode !== 'block' ? next(e) : { deny: CHECK_FAILED }))
 
   on('tool.call', { tool: 'Bash' }, async ($, e, next) => {
-    const project = isGitCommit(e.command) ? await projectFor($, mode) : undefined
+    if (!isGitCommit(e.command)) return guardShellSource($, mode, () => next(e))
+    const project = await projectFor($, mode)
     const problems = project && (await commitProblems($, project))
     if (problems === undefined) return next(e)
     return mode === 'block' ? { deny: problems } : withContext(await next(e), problems)
