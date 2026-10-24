@@ -58,7 +58,7 @@ export const sessionTokens = (logText: string): SessionTokens[] => {
     const who = l.role === 'main' ? 'planer' : 'umsetzer'
     r[`${who}In`] += l.input + l.cacheRead + l.cacheWrite
     r[`${who}Out`] += l.output
-    if (l.role === 'main') r.turns += 1
+    if (l.role === 'main') { r.turns += 1; r.model = l.model }
     r.updated = l.at
     r.costUsd = l.costUsd ?? r.costUsd
     rows.set(l.session, r)
