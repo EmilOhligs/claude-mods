@@ -55,3 +55,6 @@ Testdateien erkennt der Mod an typischen Namen wie `test_*.py`, `*_test.go`, `*.
 ## Zusammenspiel
 
 `team-delegate` stellt den Umsetzer. `token-counter` zeigt, wie sich der Verbrauch auf Planer und Umsetzer verteilt.
+
+## Offen
+- Echte Session 2026-10-24: Edit an Quellcode ohne geänderten Test wird abgelehnt (ok), aber eine Änderung per Shell (`sed -i`) geht durch. Die Sperre deckt Bash-Schreibzugriffe nicht ab.

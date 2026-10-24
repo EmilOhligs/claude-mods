@@ -35,5 +35,4 @@ team-delegate lässt den Umsetzer immer auf dem eingestellten Modell (Standard S
 - `types/index.d.ts` – State-Vertrag
 
 ## Offen
-- Der Log ist nur per Unit-Test geprüft, noch nicht in einer echten Session geschrieben worden.
-- Das Band ist noch nie in einer echten Session angeschaut worden (Layout, Farben); `claude plugin validate`/`test` nicht gelaufen. `tsc` und ein Node-Check der Logik sind sauber.
+- Echte Session 2026-10-24: ok. Band von Emil gesehen, erschien aber erst mit Verzögerung (anfangs nicht sichtbar). Log schreibt je Turn eine Zeile mit `rateLimits` (5h/7d), Umsetzer als `agent` mit `claude-sonnet-5-5`.

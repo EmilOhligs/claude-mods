@@ -17,4 +17,4 @@ Ordner `skills/<name>/SKILL.md` mit Frontmatter (`name`, `description`) anlegen.
 
 ## Offen
 
-Noch nicht in einer echten Session getestet (wird der Skill bei passenden Aufgaben geladen? greift `test-first` zuverlässig?).
+- Echte Session 2026-10-24: ok. Geladen sind genau `performance-workflow` und `test-first`, wie in der Tabelle. Ob `test-first` von selbst ausgelöst wird, ist noch nicht geprüft.

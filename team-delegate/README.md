@@ -18,8 +18,7 @@ Planer/Umsetzer in einem Chat: der Chat (z. B. auf Opus) plant, ein günstigeres
 - `hooks/register.test.ts` – Tests für Prompts, Modellleiter und Sparstufen
 
 ## Zusammenspiel
-Das Dashboard aus `token-counter` zeigt Planer und Umsetzer getrennt und empfiehlt, wann zu delegieren oder zu komprimieren ist. 
+Das Dashboard aus `token-counter` zeigt Planer und Umsetzer getrennt und empfiehlt, wann zu delegieren oder zu komprimieren ist.
 
 ## Offen
-- Nicht in einer echten Session ausprobiert; `claude plugin validate`/`test` nicht gelaufen (`tsc` sauber).
-- Nicht geprüft: ob der Planer den Umsetzer zuverlässig aufruft und ob `model` im Agent-Typ greift.
+- Echte Session 2026-10-24: ok. Umsetzer lief laut Transkript auf `claude-sonnet-5-5`, Übergabe und Rückmeldung sauber, Regeln von tdd-guard und lean-code kamen im Auftrag an.
