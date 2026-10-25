@@ -7,7 +7,7 @@ Test-first in jedem Git-Projekt: erst ein roter Test, dann der Code. Der Mod sch
 Alles gilt nur in Git-Repositories.
 
 - **Code erst nach einem Test:** Eine Quelldatei lässt sich erst ändern, wenn in der Arbeitskopie eine Testdatei geändert oder neu ist. Ändert ein Shell-Befehl trotzdem Quellcode, wird die Änderung abgelehnt und mit `git stash` zurückgenommen (zurückholen mit `git stash pop`).
-- **Tests gehören dem Planer:** Der Umsetzer (`team-delegate:umsetzer`) darf keine Testdateien ändern.
+- **Tests gehören dem Planer:** Der Umsetzer (`team-delegate:umsetzer`) darf keine Testdateien ändern, der Tester (`team-delegate:tester`) keinen Quellcode.
 - **Kein Wegschalten von Tests:** Neue `skip`-, `xfail`-, `only`- oder `ignore`-Marker werden abgelehnt (pytest, unittest, Jest/Vitest/Mocha, Go, Rust).
 - **Sofortige Rückmeldung:** Nach jeder Änderung an einer Testdatei läuft dieser Test, und Claude bekommt das Ergebnis (rot oder grün) samt Fehlermeldung zurück. Code-Dateien prüft zusätzlich der Linter, falls einer erkannt wurde.
 - **Zugende nur mit grüner Suite:** Gibt es Codeänderungen, laufen am Ende eines Zugs Tests und Linter. Sind sie rot, wird der Zug einmal angehalten. Das gilt für den Planer und für den Umsetzer.

@@ -1,6 +1,6 @@
 {
   "name": "tdd-guard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Test-first in every git project: code changes need a red test first, the implementer never edits tests, turns and commits end only with a green suite",
   "userConfig": {
     "mode": {
