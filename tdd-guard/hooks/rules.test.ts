@@ -1,6 +1,7 @@
 import { expect, test } from 'claude-code/testing'
 
 import {
+  TESTER,
   UMSETZER,
   addsSkipMarker,
   changedPaths,
@@ -327,6 +328,25 @@ test('planner rules describe the cycle and the implementer split', () => {
   expect(text).toContain('grün')
   expect(text).toContain(UMSETZER)
   expect(text).toContain('.claude/tdd-guard.json')
+})
+
+test('the tester may write tests but not source code', () => {
+  const reason = gateDecision({
+    rel: 'src/a.py',
+    oldText: '',
+    newText: 'x = 1\n',
+    agentType: TESTER,
+    hasTestChanges: true,
+  })
+  expect(reason).toContain('Tester')
+  expect(
+    gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'def test_a(): pass\n', agentType: TESTER, hasTestChanges: true }),
+  ).toBeUndefined()
+})
+
+test('planner rules let the tester write the red tests', () => {
+  expect(plannerRules()).toContain(TESTER)
+  expect(plannerRules()).not.toContain('schreibst die Tests selbst und')
 })
 
 test('the implementer suffix forbids editing tests', () => {

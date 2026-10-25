@@ -189,7 +189,7 @@ const gateReason = async (
     rel,
     oldText: change.oldText,
     newText: change.newText,
-    agentType: isTestFile(rel) ? await agentTypeOf($, change.agentId) : undefined,
+    agentType: isTestFile(rel) || isSourceFile(rel) ? await agentTypeOf($, change.agentId) : undefined,
     hasTestChanges: isSourceFile(rel) ? await testsChanged($, project.root) : true,
   })
 }

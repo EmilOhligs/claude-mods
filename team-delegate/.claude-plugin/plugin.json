@@ -1,7 +1,7 @@
 {
   "name": "team-delegate",
-  "version": "0.2.0",
-  "description": "Planner/Umsetzer: this chat plans, a cheaper model implements the delegated steps",
+  "version": "0.3.0",
+  "description": "Planner plus team: this chat plans; Umsetzer, Tester, Reviewer, Sicherheitsprüfer and Sucher run as subagents",
   "userConfig": {
     "workerModel": {
       "type": "string",

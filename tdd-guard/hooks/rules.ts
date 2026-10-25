@@ -2,6 +2,7 @@
 // command parsing, messages. No `$` calls here; register.ts does the wiring.
 
 export const UMSETZER = 'team-delegate:umsetzer'
+export const TESTER = 'team-delegate:tester'
 export const CONFIG_FILE = '.claude/tdd-guard.json'
 
 // --- path classification ----------------------------------------------------
@@ -125,6 +126,9 @@ const configReason = (): string =>
 const umsetzerReason = (rel: string): string =>
   `tdd-guard: Als Umsetzer änderst du keine Testdateien (${rel}), sie sind die Spezifikation des Planers. Ist der Test falsch, brich ab und begründe in deinem Bericht, was am Test nicht stimmt.`
 
+const testerReason = (rel: string): string =>
+  `tdd-guard: Als Tester schreibst du nur Tests; ${rel} ist Quellcode. Melde dem Planer den roten Test, die Umsetzung macht der Umsetzer.`
+
 const skipReason = (rel: string): string =>
   `tdd-guard: ${rel} bekommt einen neuen skip-, xfail-, only- oder ignore-Marker. Tests werden nicht übersprungen oder isoliert, damit die Suite grün wird. Das geht nur mit ausdrücklicher Zustimmung des Nutzers: frage ihn.`
 
@@ -138,6 +142,7 @@ export const gateDecision = (input: GateInput): string | undefined => {
     if (input.agentType === UMSETZER) return umsetzerReason(rel)
     return addsSkipMarker(input.oldText, input.newText) ? skipReason(rel) : undefined
   }
+  if (input.agentType === TESTER && isSourceFile(rel)) return testerReason(rel)
   if (isSourceFile(rel) && !input.hasTestChanges) return noTestReason(rel)
   return undefined
 }
@@ -316,11 +321,11 @@ export const plannerRules = (): string =>
     '- Kein skip, xfail oder only ohne Zustimmung des Nutzers.',
     '- Ohne Test gehen: reine Dokumentation, Formatierung, Umbenennung, Einweg-Skripte. Lehnt die Sperre eine solche Änderung an Quellcode ab, frage den Nutzer.',
     '- Dein Bericht nennt: welcher Test, warum er rot war, dass er jetzt grün ist, und das Ergebnis der ganzen Suite.',
-    'Rollen mit dem Umsetzer:',
-    '- Du als Planer schreibst die Tests selbst und prüfst, dass sie rot sind.',
+    'Rollen mit Tester und Umsetzer:',
+    `- Die roten Tests schreibst du selbst oder lässt sie vom Tester (${TESTER}) schreiben; prüfe in beiden Fällen selbst, dass sie aus dem richtigen Grund rot sind.`,
     `- Den Umsetzer (${UMSETZER}) rufst du pro Aufruf mit einem roten Test auf: Pfad, Testname und Fehlermeldung, dazu die Zieldateien und der Auftrag "grün machen, keine Testdateien ändern". Danach prüfst du das Ergebnis selbst.`,
     'Was erzwungen wird (nur in Git-Repositories):',
-    '- Quellcode lässt sich erst ändern, wenn in der Arbeitskopie ein Test geändert oder neu ist. Der Umsetzer ändert keine Testdateien, neue skip-/only-Marker werden abgelehnt, und Zug und Commit enden nur mit grüner Suite.',
+    '- Quellcode lässt sich erst ändern, wenn in der Arbeitskopie ein Test geändert oder neu ist. Der Umsetzer ändert keine Testdateien, der Tester keinen Quellcode, neue skip-/only-Marker werden abgelehnt, und Zug und Commit enden nur mit grüner Suite.',
     `- Abschalten kann nur der Nutzer, in ${CONFIG_FILE} mit {"enabled": false} oder über die Mod-Option mode. Ändere diese Datei nie selbst.`,
   ].join('\n')
 
