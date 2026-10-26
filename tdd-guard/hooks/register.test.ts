@@ -252,3 +252,17 @@ test('the system prompt carries the test-first rules', async ($, on) => {
   expect(section?.scope).toBe('session')
   expect(section?.text).toContain('rot')
 })
+
+test('implementers of both teams get the test-first rules on spawn, others do not', async ($, on) => {
+  const prompts: Record<string, string> = {}
+  on('agent.spawn', (_: any, e: any) => {
+    prompts[e.subagentType] = e.prompt
+    return { model: 'sonnet', agentId: 'x' }
+  })
+  await setup($, on, { porcelain: '' })
+  for (const subagentType of [UMSETZER, 'frontend-team:ui-ingenieur', 'Explore'])
+    await $.agent.spawn({ subagentType, prompt: 'auftrag', description: 'd' })
+  expect(prompts[UMSETZER]).toContain('Testdateien')
+  expect(prompts['frontend-team:ui-ingenieur']).toContain('Testdateien')
+  expect(prompts.Explore).toBe('auftrag')
+})

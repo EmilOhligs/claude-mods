@@ -129,11 +129,21 @@ export type GateInput = {
 const configReason = (): string =>
   `tdd-guard: ${CONFIG_FILE} ändert nur der Nutzer selbst. Ändere die Datei nicht und umgehe die Sperre nicht; bitte den Nutzer, sie bei Bedarf anzupassen.`
 
-const umsetzerReason = (rel: string): string =>
-  `tdd-guard: Als Umsetzer änderst du keine Testdateien (${rel}), sie sind die Spezifikation des Planers. Ist der Test falsch, brich ab und begründe in deinem Bericht, was am Test nicht stimmt.`
+// frontend-team calls its roles Ingenieur and CEO, team-delegate Umsetzer and Planer
+const rolesOf = (agentType: string | undefined) =>
+  agentType?.startsWith('frontend-team:')
+    ? { implementer: 'Ingenieur', tester: 'Test-Ingenieur', ofLead: 'des CEO', toLead: 'dem CEO', builder: 'ein Ingenieur' }
+    : { implementer: 'Umsetzer', tester: 'Tester', ofLead: 'des Planers', toLead: 'dem Planer', builder: 'der Umsetzer' }
 
-const testerReason = (rel: string): string =>
-  `tdd-guard: Als Tester schreibst du nur Tests; ${rel} ist Quellcode. Melde dem Planer den roten Test, die Umsetzung macht der Umsetzer.`
+const umsetzerReason = (rel: string, agentType: string | undefined): string => {
+  const r = rolesOf(agentType)
+  return `tdd-guard: Als ${r.implementer} änderst du keine Testdateien (${rel}), sie sind die Spezifikation ${r.ofLead}. Ist der Test falsch, brich ab und begründe in deinem Bericht, was am Test nicht stimmt.`
+}
+
+const testerReason = (rel: string, agentType: string | undefined): string => {
+  const r = rolesOf(agentType)
+  return `tdd-guard: Als ${r.tester} schreibst du nur Tests; ${rel} ist Quellcode. Melde ${r.toLead} den roten Test, die Umsetzung macht ${r.builder}.`
+}
 
 const skipReason = (rel: string): string =>
   `tdd-guard: ${rel} bekommt einen neuen skip-, xfail-, only- oder ignore-Marker. Tests werden nicht übersprungen oder isoliert, damit die Suite grün wird. Das geht nur mit ausdrücklicher Zustimmung des Nutzers: frage ihn.`
@@ -145,10 +155,10 @@ export const gateDecision = (input: GateInput): string | undefined => {
   const { rel } = input
   if (isConfigFile(rel)) return configReason()
   if (isTestFile(rel)) {
-    if (isImplementer(input.agentType)) return umsetzerReason(rel)
+    if (isImplementer(input.agentType)) return umsetzerReason(rel, input.agentType)
     return addsSkipMarker(input.oldText, input.newText) ? skipReason(rel) : undefined
   }
-  if (isTester(input.agentType) && isSourceFile(rel)) return testerReason(rel)
+  if (isTester(input.agentType) && isSourceFile(rel)) return testerReason(rel, input.agentType)
   if (isSourceFile(rel) && !input.hasTestChanges) return noTestReason(rel)
   return undefined
 }
@@ -330,16 +340,19 @@ export const plannerRules = (): string =>
     'Rollen mit Tester und Umsetzer:',
     `- Die roten Tests schreibst du selbst oder lässt sie vom Tester (${TESTER}) schreiben; prüfe in beiden Fällen selbst, dass sie aus dem richtigen Grund rot sind.`,
     `- Den Umsetzer (${UMSETZER}) rufst du pro Aufruf mit einem roten Test auf: Pfad, Testname und Fehlermeldung, dazu die Zieldateien und der Auftrag "grün machen, keine Testdateien ändern". Danach prüfst du das Ergebnis selbst.`,
+    '- Im Frontend-Modus (frontend-team, du bist CEO) übernimmt frontend-team:test-ingenieur die Rolle des Testers und ui-, logik- und anbindungs-ingenieur die des Umsetzers; die Tests schreibst du dann nicht selbst.',
     'Was erzwungen wird (nur in Git-Repositories):',
     '- Quellcode lässt sich erst ändern, wenn in der Arbeitskopie ein Test geändert oder neu ist. Der Umsetzer ändert keine Testdateien, der Tester keinen Quellcode, neue skip-/only-Marker werden abgelehnt, und Zug und Commit enden nur mit grüner Suite.',
     `- Abschalten kann nur der Nutzer, in ${CONFIG_FILE} mit {"enabled": false} oder über die Mod-Option mode. Ändere diese Datei nie selbst.`,
   ].join('\n')
 
-export const umsetzerSuffix = (): string =>
-  [
-    'Test-first-Regeln für dich als Umsetzer:',
-    '- Ändere keine Testdateien. Die Tests sind die Spezifikation des Planers.',
+export const umsetzerSuffix = (agentType: string = UMSETZER): string => {
+  const r = rolesOf(agentType)
+  return [
+    `Test-first-Regeln für dich als ${r.implementer}:`,
+    `- Ändere keine Testdateien. Die Tests sind die Spezifikation ${r.ofLead}.`,
     '- Mache den genannten roten Test grün, mit so wenig Code wie nötig.',
     '- Am Ende müssen die ganze Suite und der Linter grün sein, sonst kannst du nicht abschließen.',
     '- Ist der Test falsch, brich ab und begründe es in deinem Bericht.',
   ].join('\n')
+}

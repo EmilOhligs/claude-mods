@@ -319,6 +319,6 @@ export const register: Register = (on, options) => {
 
   on('agent.spawn', async ($, e, next) => {
     if (!isImplementer(e.subagentType) || (await projectFor($, mode)) === undefined) return next(e)
-    return next({ ...e, prompt: `${e.prompt}\n\n${umsetzerSuffix()}` })
+    return next({ ...e, prompt: `${e.prompt}\n\n${umsetzerSuffix(e.subagentType)}` })
   })
 }
