@@ -5,6 +5,12 @@ export const UMSETZER = 'team-delegate:umsetzer'
 export const TESTER = 'team-delegate:tester'
 export const CONFIG_FILE = '.claude/tdd-guard.json'
 
+// frontend-team (elias-mods) has its own roles with the same split
+const IMPLEMENTERS = [UMSETZER, 'frontend-team:ui-ingenieur', 'frontend-team:logik-ingenieur', 'frontend-team:anbindungs-ingenieur']
+const TESTERS = [TESTER, 'frontend-team:test-ingenieur']
+export const isImplementer = (agentType: string | undefined): boolean => IMPLEMENTERS.includes(agentType ?? '')
+const isTester = (agentType: string | undefined): boolean => TESTERS.includes(agentType ?? '')
+
 // --- path classification ----------------------------------------------------
 
 const CODE_EXTENSION =
@@ -139,10 +145,10 @@ export const gateDecision = (input: GateInput): string | undefined => {
   const { rel } = input
   if (isConfigFile(rel)) return configReason()
   if (isTestFile(rel)) {
-    if (input.agentType === UMSETZER) return umsetzerReason(rel)
+    if (isImplementer(input.agentType)) return umsetzerReason(rel)
     return addsSkipMarker(input.oldText, input.newText) ? skipReason(rel) : undefined
   }
-  if (input.agentType === TESTER && isSourceFile(rel)) return testerReason(rel)
+  if (isTester(input.agentType) && isSourceFile(rel)) return testerReason(rel)
   if (isSourceFile(rel) && !input.hasTestChanges) return noTestReason(rel)
   return undefined
 }

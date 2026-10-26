@@ -344,6 +344,22 @@ test('the tester may write tests but not source code', () => {
   ).toBeUndefined()
 })
 
+test('frontend-team engineers may not edit tests', () => {
+  for (const agentType of ['frontend-team:ui-ingenieur', 'frontend-team:logik-ingenieur', 'frontend-team:anbindungs-ingenieur']) {
+    expect(
+      gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'def test_a(): ...\n', agentType, hasTestChanges: true }),
+    ).toContain('Umsetzer')
+  }
+})
+
+test('the frontend-team test engineer may write tests but not source code', () => {
+  const agentType = 'frontend-team:test-ingenieur'
+  expect(gateDecision({ rel: 'src/a.py', oldText: '', newText: 'x = 1\n', agentType, hasTestChanges: true })).toContain('Tester')
+  expect(
+    gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'def test_a(): pass\n', agentType, hasTestChanges: true }),
+  ).toBeUndefined()
+})
+
 test('planner rules let the tester write the red tests', () => {
   expect(plannerRules()).toContain(TESTER)
   expect(plannerRules()).not.toContain('schreibst die Tests selbst und')
