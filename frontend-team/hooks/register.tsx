@@ -1,8 +1,8 @@
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, PluginOptions, Register } from 'claude-code'
+import type { PluginOptions, Register } from 'claude-code'
 
+import type { Level } from '../types'
 import { and, ceoWriteVerdict, editedPath, engineerModelVerdict, reviewerModelVerdict } from './policy'
-import { EMPTY, addUsage, bar, colorOf, fmt, levelOf, limitLabel, readTokens, recommend, report, resetIso, shortModel, sum } from './tokens'
 
 export const COMMAND = 'frontend'
 
@@ -23,8 +23,6 @@ const OPTIONAL_REVIEWERS: Record<string, string> = {
 /** Emil's team-delegate: its implementer and its "small changes yourself" rule clash with the code lock. */
 const FOREIGN_IMPLEMENTER = 'team-delegate:umsetzer'
 const FOREIGN_PLANNER_SECTION = 'team-delegate:planner'
-
-export type Level = 'leicht' | 'design' | 'voll'
 
 export type Settings = {
   targetScore: number
@@ -87,19 +85,8 @@ export const ceoSection = (plugin: string, s: Settings): string => {
   ].join('\n')
 }
 
-const stats = atom({ plugin: 'frontend-team', key: 'stats' } as const, EMPTY)
-const isHidden = atom({ plugin: 'frontend-team', key: 'isHidden' } as const, false)
-const isOpen = atom({ plugin: 'frontend-team', key: 'isOpen' } as const, false)
 const isActive = atom({ plugin: 'frontend-team', key: 'isActive' } as const, false)
 const level = atom({ plugin: 'frontend-team', key: 'level' } as const, 'voll' as Level)
-
-let lastLevel = 'ok'
-
-const refresh = async ($: EngineInterface) => {
-  const rec = recommend(await read($, stats))
-  if (rec.level !== lastLevel && (rec.level === 'warn' || rec.level === 'alert')) $.ui.toast(rec.text)
-  lastLevel = rec.level
-}
 
 export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
@@ -108,7 +95,6 @@ export const register: Register = (on, options) => {
       description: 'Frontend-Team starten: CEO plant, Ingenieure bauen, TÜV prüft',
       argumentHint: '[leicht|design|voll|aus] [Aufgabe]',
     })
-    await $.command.register({ name: 'tokens', description: 'Token-Verbrauch CEO und Team (hide, show, details)' })
     return next(e)
   })
 
@@ -116,6 +102,7 @@ export const register: Register = (on, options) => {
     const { level: chosen, task } = parseArgs(e.args)
     if (chosen === 'aus') {
       await update($, isActive, () => false)
+      $.ui.status(undefined)
       return {
         text: 'Frontend-Team aus: Code-Sperre aufgehoben, CEO-Abschnitt entfernt.',
         // the CEO instructions stay in the transcript, so tell the model they ended
@@ -124,6 +111,7 @@ export const register: Register = (on, options) => {
     }
     await update($, isActive, () => true)
     await update($, level, () => chosen)
+    $.ui.status(`Frontend-Team: ${chosen}`)
     const s = readSettings(options, chosen)
     $.ui.toast(`Frontend-Team aktiv (${chosen}): Ziel ${s.targetScore}/10, ${s.maxRounds} Runden, Code-Sperre für den CEO an`)
     // a command's own answer starts no model turn, and $.prompt.submit from here would wait on itself
@@ -156,84 +144,5 @@ export const register: Register = (on, options) => {
         { id: 'frontend-team:ceo', text: ceoSection($.plugin.name, readSettings(options, await read($, level))), scope: 'session' },
       ],
     }
-  })
-
-  on('turn.complete', async ($, e, next) => {
-    const done = await next(e)
-    if (e.usage) {
-      const role = e.agentId === undefined ? 'main' : 'agent'
-      const usage = e.usage
-      await update($, stats, (s) => addUsage(s, role, usage))
-      await refresh($)
-    }
-    return done
-  })
-
-  on('session.measure', async ($, e, next) => {
-    await update($, stats, (s) => ({
-      ...s,
-      contextPercent: e.context.percent ?? s.contextPercent,
-      rateLimits: e.rateLimits.map((l) => ({ kind: l.kind, percentUsed: l.percentUsed, resetsAt: resetIso(l) })),
-      costUsd: e.cost?.usd ?? s.costUsd,
-    }))
-    await refresh($)
-    return next(e)
-  })
-
-  on('command.run', { command: 'tokens' }, async ($, e) => {
-    const arg = e.args.trim()
-    if (arg === 'hide') await update($, isHidden, () => true)
-    if (arg === 'show') await update($, isHidden, () => false)
-    if (arg === 'details') await update($, isOpen, (v) => !v)
-    return { text: report(await read($, stats)) }
-  })
-
-  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
-    const s = await read($, stats)
-    const hasData = s.contextPercent !== undefined || Object.keys(s.rows).length > 0
-    if (e.props.hasSurvey || !hasData || (await read($, isHidden))) return next(e)
-
-    const { Box, Button, Text } = $.ui.resolve(e)
-    const open = await read($, isOpen)
-    const active = await read($, isActive)
-    const rec = recommend(s)
-    const meters = [
-      ...(s.contextPercent === undefined ? [] : [{ label: 'ctx', percent: s.contextPercent }]),
-      ...s.rateLimits.map((l) => ({ label: limitLabel(l.kind), percent: l.percentUsed })),
-    ]
-    const main = sum(s, 'main')
-    const team = sum(s, 'agent')
-
-    return (
-      <Box flexDirection="column">
-        <Box gap={2} flexWrap="wrap">
-          {meters.map((m) => (
-            <Text color={colorOf(levelOf(m.percent))}>
-              {m.label} {bar(m.percent)} {Math.round(m.percent)}%
-            </Text>
-          ))}
-          {s.costUsd !== undefined && <Text dimColor>${s.costUsd.toFixed(2)}</Text>}
-          {active && <Text color="cyan">Frontend-Team</Text>}
-        </Box>
-        <Text dimColor>
-          CEO {s.mainModel ? shortModel(s.mainModel) : '–'} ↑{fmt(readTokens(main))} ↓{fmt(main.output)}
-          {team.turns > 0 ? ` · Team ↑${fmt(readTokens(team))} ↓${fmt(team.output)}` : ''}
-        </Text>
-        {open &&
-          Object.entries(s.rows).map(([key, b]) => (
-            <Text dimColor>
-              {'  '}
-              {key.startsWith('main|') ? 'CEO ' : 'Team'} {shortModel(key.split('|')[1] ?? '')}: ↑{fmt(readTokens(b))} ↓{fmt(b.output)} · {b.turns} Turns
-            </Text>
-          ))}
-        <Text color={colorOf(rec.level)} dimColor={rec.level === 'ok'}>
-          → {rec.text}
-        </Text>
-        <Box gap={2}>
-          <Button key="details" label={open ? 'Weniger' : 'Details'} onPress={() => update($, isOpen, (v) => !v)} />
-          <Button key="hide" label="Ausblenden" onPress={() => update($, isHidden, () => true)} />
-        </Box>
-      </Box>
-    )
   })
 }

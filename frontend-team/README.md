@@ -6,7 +6,7 @@ Von Elias ([rethfeldelias/elias-mods](https://github.com/rethfeldelias/elias-mod
 
     /plugin install frontend-team --marketplace EmilOhligs/claude-mods
 
-Die Token-Anzeige dieses Mods doppelt die von `token-counter`; beide zusammen zeigen zwei Bänder und registrieren `/tokens` zweimal.
+Den Token-Verbrauch zeigt `token-counter` (die eigene Anzeige von Elias' Version ist hier entfernt).
 
 
 ## Starten
@@ -58,10 +58,6 @@ CEO (Opus) – plant, verteilt, entscheidet, schreibt keinen Code
 ## Code-Sperre
 
 Sobald `/frontend` läuft, lehnt der Mod jeden Schreibzugriff der Hauptsession (CEO, Opus) auf Code-Dateien ab, auch für eine einzelne Zeile. Code und Tests schreiben nur die Ingenieure mit Sonnet; ein Aufruf eines Ingenieurs mit einem anderen Modell wird abgelehnt, ebenso allgemeine Agenten (general-purpose, team-delegate:umsetzer), die Code schreiben könnten. Der CEO darf Markdown und Dateien in `.frontend-team/` schreiben. Der allgemeine Umsetzer aus `team-delegate` wird im Frontend-Modus ausgeblendet, damit nichts an der Sperre vorbeiläuft. Grenze: Dateiänderungen über Shell-Befehle erkennt die Sperre nicht, sie sind dem CEO per Anweisung verboten.
-
-## Token-Anzeige
-
-Über dem Prompt: Kontext (`ctx`), 5-Stunden- und 7-Tage-Limit, Kosten, Verbrauch CEO gegen Team und eine Empfehlung. `/tokens` gibt einen Bericht, `/tokens details`, `/tokens hide`, `/tokens show`. Übernommen aus `token-counter` von Emil; den dort bitte deaktivieren, sonst erscheint die Anzeige doppelt.
 
 ## Ablauf
 

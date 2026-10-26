@@ -133,3 +133,26 @@ test('the task after the level word reaches the model with the next message', as
   const bare = await $.command.run({ command: 'frontend', args: 'design' })
   expect(bare.text).not.toContain('"los"')
 })
+
+test('the token band is left to token-counter: no /tokens command of its own', async ($, on) => {
+  const names: string[] = []
+  on('command.register', (_: any, e: any) => {
+    names.push(e.name)
+    return { value: { command: e.name } }
+  })
+  on('session.start', (_: any, e: any) => ({ cwd: e.cwd }))
+  await $.session.start({ cwd: '/repo', surface: 'desktop', isInteractive: true })
+  expect(names).toEqual(['frontend'])
+})
+
+test('the status line shows the active level and clears after aus', async ($, on) => {
+  const status: (string | undefined)[] = []
+  on('ui.status', (_: any, e: any) => {
+    status.push(e.text)
+    return { value: undefined }
+  })
+  await start($, on)
+  await $.command.run({ command: 'frontend', args: 'leicht Baue X' })
+  await $.command.run({ command: 'frontend', args: 'aus' })
+  expect(status).toEqual(['Frontend-Team: leicht', undefined])
+})
