@@ -2,7 +2,7 @@ import type { EngineInterface, PluginOptions, Register, ToolCallResult } from 'c
 
 import {
   CONFIG_FILE,
-  UMSETZER,
+  isImplementer,
   changedPaths,
   detectCommands,
   feedbackMessage,
@@ -302,8 +302,8 @@ export const register: Register = (on, options) => {
   })
 
   on('classic.SubagentStop', async ($, e, next) => {
-    const isImplementer = mode === 'block' && e.agent_type === UMSETZER
-    const project = isImplementer ? await projectFor($, mode) : undefined
+    const checksImplementer = mode === 'block' && isImplementer(e.agent_type)
+    const project = checksImplementer ? await projectFor($, mode) : undefined
     const reason = project && (await stopReason($, project, e.stop_hook_active))
     return reason === undefined ? next(e) : { ...(await next(e)), block: reason }
   })
@@ -318,7 +318,7 @@ export const register: Register = (on, options) => {
   })
 
   on('agent.spawn', async ($, e, next) => {
-    if (e.subagentType !== UMSETZER || (await projectFor($, mode)) === undefined) return next(e)
-    return next({ ...e, prompt: `${e.prompt}\n\n${umsetzerSuffix()}` })
+    if (!isImplementer(e.subagentType) || (await projectFor($, mode)) === undefined) return next(e)
+    return next({ ...e, prompt: `${e.prompt}\n\n${umsetzerSuffix(e.subagentType)}` })
   })
 }

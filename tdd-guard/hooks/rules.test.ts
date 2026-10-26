@@ -344,6 +344,22 @@ test('the tester may write tests but not source code', () => {
   ).toBeUndefined()
 })
 
+test('frontend-team engineers may not edit tests', () => {
+  for (const agentType of ['frontend-team:ui-ingenieur', 'frontend-team:logik-ingenieur', 'frontend-team:anbindungs-ingenieur']) {
+    expect(
+      gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'def test_a(): ...\n', agentType, hasTestChanges: true }),
+    ).toMatch(/Als Ingenieur .*des CEO/)
+  }
+})
+
+test('the frontend-team test engineer may write tests but not source code', () => {
+  const agentType = 'frontend-team:test-ingenieur'
+  expect(gateDecision({ rel: 'src/a.py', oldText: '', newText: 'x = 1\n', agentType, hasTestChanges: true })).toMatch(/Als Test-Ingenieur .*dem CEO/)
+  expect(
+    gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'def test_a(): pass\n', agentType, hasTestChanges: true }),
+  ).toBeUndefined()
+})
+
 test('planner rules let the tester write the red tests', () => {
   expect(plannerRules()).toContain(TESTER)
   expect(plannerRules()).not.toContain('schreibst die Tests selbst und')
@@ -351,4 +367,20 @@ test('planner rules let the tester write the red tests', () => {
 
 test('the implementer suffix forbids editing tests', () => {
   expect(umsetzerSuffix()).toContain('Testdateien')
+})
+
+test('team-delegate roles keep their own names in refusals', () => {
+  const reason = gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'x\n', agentType: UMSETZER, hasTestChanges: true })
+  expect(reason).toMatch(/Als Umsetzer .*des Planers/)
+  expect(reason).not.toContain('CEO')
+})
+
+test('the implementer suffix names the lead of the agent\'s own team', () => {
+  expect(umsetzerSuffix('frontend-team:ui-ingenieur')).toContain('des CEO')
+  expect(umsetzerSuffix('frontend-team:ui-ingenieur')).not.toContain('Planer')
+  expect(umsetzerSuffix(UMSETZER)).toContain('des Planers')
+})
+
+test('planner rules name the frontend-team roles for the CEO', () => {
+  expect(plannerRules()).toContain('frontend-team:test-ingenieur')
 })

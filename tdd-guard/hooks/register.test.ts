@@ -182,6 +182,17 @@ test('the implementer may not finish while the suite is red', async ($, on) => {
   expect(result.block).toContain('FAILED')
 })
 
+test('a frontend-team engineer may not finish while the suite is red', async ($, on) => {
+  await setup($, on, { porcelain: ' M src/a.py\n', failing: true })
+  const result: any = await $.classic.SubagentStop({
+    stop_hook_active: false,
+    agent_id: 'f1',
+    agent_type: 'frontend-team:ui-ingenieur',
+    agent_transcript_path: '/tmp/t.jsonl',
+  } as any)
+  expect(result.block).toContain('FAILED')
+})
+
 test('other subagents are not held back', async ($, on) => {
   await setup($, on, { porcelain: ' M src/a.py\n', failing: true })
   const result: any = await $.classic.SubagentStop({
@@ -240,4 +251,18 @@ test('the system prompt carries the test-first rules', async ($, on) => {
   const section = result.sections.find((s: any) => s.id === 'tdd-guard:rules')
   expect(section?.scope).toBe('session')
   expect(section?.text).toContain('rot')
+})
+
+test('implementers of both teams get the test-first rules on spawn, others do not', async ($, on) => {
+  const prompts: Record<string, string> = {}
+  on('agent.spawn', (_: any, e: any) => {
+    prompts[e.subagentType] = e.prompt
+    return { model: 'sonnet', agentId: 'x' }
+  })
+  await setup($, on, { porcelain: '' })
+  for (const subagentType of [UMSETZER, 'frontend-team:ui-ingenieur', 'Explore'])
+    await $.agent.spawn({ subagentType, prompt: 'auftrag', description: 'd' })
+  expect(prompts[UMSETZER]).toContain('Testdateien')
+  expect(prompts['frontend-team:ui-ingenieur']).toContain('Testdateien')
+  expect(prompts.Explore).toBe('auftrag')
 })

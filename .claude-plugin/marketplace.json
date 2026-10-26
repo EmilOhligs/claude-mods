@@ -23,6 +23,10 @@
     {
       "name": "lean-code",
       "source": "./lean-code"
+    },
+    {
+      "name": "frontend-team",
+      "source": "./frontend-team"
     }
   ]
 }
