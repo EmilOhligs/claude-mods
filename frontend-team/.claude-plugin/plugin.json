@@ -1,0 +1,59 @@
+{
+  "name": "frontend-team",
+  "version": "0.3.0",
+  "types": "./types/index.d.ts",
+  "description": "Frontend team: the chat is the CEO, engineers build, a TÜV of reviewers rates every round until the target score is reached",
+  "userConfig": {
+    "targetScore": {
+      "type": "string",
+      "title": "Zielnote",
+      "description": "Mindestnote jedes Prüfers (von 10), damit eine Aufgabe als fertig gilt",
+      "default": "9",
+      "options": ["7", "8", "9", "10"]
+    },
+    "maxRounds": {
+      "type": "string",
+      "title": "Runden bis zur Rückfrage",
+      "description": "Nach so vielen Bau- und Prüfrunden hält das Team an und fragt den Menschen",
+      "default": "4",
+      "options": ["2", "3", "4", "5", "6"]
+    },
+    "showUiEvery": {
+      "type": "string",
+      "title": "Oberfläche zeigen alle … Runden",
+      "description": "So oft wird die Oberfläche dem Menschen zum Durchklicken gezeigt",
+      "default": "3",
+      "options": ["1", "2", "3"]
+    },
+    "reviewPrivacy": {
+      "type": "boolean",
+      "title": "Prüfer Datenschutz",
+      "description": "Zusätzlicher Prüfer für personenbezogene Daten in Oberfläche, Speicher und Logs",
+      "default": false
+    },
+    "reviewPerformance": {
+      "type": "boolean",
+      "title": "Prüfer Performance",
+      "description": "Zusätzlicher Prüfer für Ladezeit, Reaktionszeit und Bundle-Größe",
+      "default": false
+    },
+    "reviewResponsive": {
+      "type": "boolean",
+      "title": "Prüfer Responsive",
+      "description": "Zusätzlicher Prüfer für Handy, Tablet, Desktop und Browser",
+      "default": false
+    },
+    "reviewTexts": {
+      "type": "boolean",
+      "title": "Prüfer UX-Texte",
+      "description": "Zusätzlicher Prüfer für Beschriftungen, Fehlermeldungen und Tonfall",
+      "default": false
+    },
+    "reviewCode": {
+      "type": "boolean",
+      "title": "Prüfer Code-Review",
+      "description": "Zusätzlicher Prüfer für Struktur, Wartbarkeit und doppelten Code",
+      "default": false
+    }
+  }
+}
