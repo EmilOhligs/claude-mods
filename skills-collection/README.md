@@ -6,6 +6,7 @@ Skills für die Programmierarbeit. Nach der Installation in allen Projekten verf
 | --- | --- |
 | `performance-workflow` | Code soll schneller werden: messen, profilen, Algorithmus vor Details, nachmessen, Ergebnis prüfen |
 | `test-first` | Jede Aufgabe, die Verhalten ändert: erst ein fehlschlagender Test, dann der Code |
+| `befehl-erklaeren` | Jeder vorgeschlagene Terminal-Befehl bekommt eine Kurzerklärung (was er tut, ob er etwas ändert); auf Nachfrage oder bei `sudo`, Löschen, Systemeinstellungen die Langform: Teile der Reihe nach, was sich ändert, worauf achten |
 
 ## Installation
 
@@ -17,4 +18,4 @@ Ordner `skills/<name>/SKILL.md` mit Frontmatter (`name`, `description`) anlegen.
 
 ## Offen
 
-- Echte Session 2026-10-24: ok. Geladen sind genau `performance-workflow` und `test-first`, wie in der Tabelle. Ob `test-first` von selbst ausgelöst wird, ist noch nicht geprüft.
+- Echte Session 2026-10-24: ok. Geladen waren genau `performance-workflow` und `test-first` (vor `befehl-erklaeren`). Ob `test-first` von selbst ausgelöst wird, ist noch nicht geprüft.
