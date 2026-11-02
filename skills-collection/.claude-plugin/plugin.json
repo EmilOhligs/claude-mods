@@ -1,5 +1,5 @@
 {
   "name": "skills-collection",
-  "version": "0.1.0",
-  "description": "Skills für Programmierarbeit: Geschwindigkeits-Optimierung nach Messung und Test-first-Vorgehen"
+  "version": "0.2.0",
+  "description": "Skills für Programmierarbeit: Geschwindigkeits-Optimierung nach Messung, Test-first-Vorgehen und Erklären von Shell-Befehlen"
 }
