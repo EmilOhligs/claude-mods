@@ -193,6 +193,17 @@ test('a frontend-team engineer may not finish while the suite is red', async ($,
   expect(result.block).toContain('FAILED')
 })
 
+test('a team engineer may not finish while the suite is red', async ($, on) => {
+  await setup($, on, { porcelain: ' M src/a.py\n', failing: true })
+  const result: any = await $.classic.SubagentStop({
+    stop_hook_active: false,
+    agent_id: 't1',
+    agent_type: 'team:logik-ingenieur',
+    agent_transcript_path: '/tmp/t.jsonl',
+  } as any)
+  expect(result.block).toContain('FAILED')
+})
+
 test('other subagents are not held back', async ($, on) => {
   await setup($, on, { porcelain: ' M src/a.py\n', failing: true })
   const result: any = await $.classic.SubagentStop({

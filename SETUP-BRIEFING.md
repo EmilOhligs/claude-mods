@@ -16,13 +16,13 @@ Dieses Briefing ist für Claude (Claude Code oder Claude im Chat) auf dem Accoun
 
 | Mod | Was er macht | Einstellbar |
 | --- | --- | --- |
-| `team-delegate` | Der Chat (z. B. Opus) wird zum **Planer**, ein günstigeres Modell als Agent `team-delegate:umsetzer` setzt einzelne Schritte um. Spart Tokens beim teuren Modell. | `workerModel` (`haiku`/`sonnet`/`opus`, Standard `sonnet`), `canEdit` (Umsetzer darf Dateien ändern) |
+| `team` | Team in Stufen, wählbar mit `/team-0` bis `/team-4`. Standard ist Stufe 1: Der Chat (z. B. Opus) wird zum **Planer**, ein günstigeres Modell als Agent `team:umsetzer` setzt einzelne Schritte um. Ab Stufe 2 leitet der Chat als CEO, Ingenieure bauen, Prüfer bewerten bis zur Zielnote. | `workerModel`, `canEdit`, Zielnote, Runden, zuschaltbare Prüfer |
 | `tdd-guard` | Erzwingt **Test-first** in Git-Projekten: Quellcode erst nach geändertem Test, Umsetzer ändert keine Tests, keine neuen `skip`/`only`-Marker, Zugende und `git commit` nur mit grüner Suite. Erkennt Python (pytest, ruff) und Node (`npm test`, `npm run lint`). | `mode` (`block`/`warn`/`off`), pro Projekt `.claude/tdd-guard.json` |
 | `lean-code` | **Schlanker Code** als Dauerregel (nach Ponytail): kleinste vollständige Änderung, nichts Ungefragtes. Tests, Sicherheit und Validierung werden nie gekürzt. | `level` (`lite`/`full`/`ultra`/`off`), `subagents` |
 | `token-counter` | **Dashboard** über dem Prompt: Kontext, 5h-/7d-Limits, Kosten, Verbrauch Planer vs. Umsetzer, Empfehlung für `/compact` oder Delegieren. Befehl `/tokens`. | keine Optionen |
 | `skills-collection` | Zwei Skills: `test-first` und `performance-workflow` (erst messen, dann optimieren). | keine Optionen |
 
-Zusammenspiel: `team-delegate` stellt den Umsetzer, `tdd-guard` und `lean-code` hängen ihre Regeln auch an dessen Auftrag, `token-counter` zeigt, wie sich der Verbrauch verteilt. Jeder Mod läuft aber auch allein.
+Zusammenspiel: `team` stellt den Umsetzer, `tdd-guard` und `lean-code` hängen ihre Regeln auch an dessen Auftrag, `token-counter` zeigt, wie sich der Verbrauch verteilt. Jeder Mod läuft aber auch allein.
 
 Tipp für den Einstieg: `tdd-guard` im Modus `block` ist streng. Wer Test-first nicht gewohnt ist, startet mit `warn` oder lässt den Mod erst weg.
 
@@ -49,7 +49,7 @@ claude plugin marketplace add EmilOhligs/claude-mods
 Danach die gewünschten Mods installieren, zum Beispiel:
 
 ```bash
-claude plugin install team-delegate@claude-mods
+claude plugin install team@claude-mods
 claude plugin install token-counter@claude-mods
 claude plugin install lean-code@claude-mods
 claude plugin install skills-collection@claude-mods
@@ -116,7 +116,7 @@ Pro Projekt lässt sich `tdd-guard` in `.claude/tdd-guard.json` anpassen oder mi
 In einer **neuen** Session:
 
 1. `token-counter`: Das Band über dem Prompt erscheint (manchmal mit kurzer Verzögerung), `/tokens` gibt einen Bericht aus.
-2. `team-delegate`: Ein Toast nennt das Modell des Umsetzers. Bei einer größeren Aufgabe gibt Claude Schritte an `team-delegate:umsetzer` ab.
+2. `team`: Die Statuszeile zeigt „Team: 1 Delegieren“, `/team` listet die fünf Stufen. Bei einer größeren Aufgabe gibt Claude Schritte an `team:umsetzer` ab.
 3. `tdd-guard`: In einem Git-Projekt eine Quelldatei ohne geänderten Test bearbeiten lassen; die Änderung wird abgelehnt (bzw. bei `warn` nur kommentiert).
 4. `skills-collection`: Die Skills `skills-collection:test-first` und `skills-collection:performance-workflow` sind gelistet.
 5. Optional die Tests eines Mods laufen lassen: `claude plugin test <ordner>`.

@@ -1,13 +1,16 @@
 // Pure logic of the tdd-guard mod: path classification, gate decisions, git and
 // command parsing, messages. No `$` calls here; register.ts does the wiring.
 
-export const UMSETZER = 'team-delegate:umsetzer'
-export const TESTER = 'team-delegate:tester'
+export const UMSETZER = 'team:umsetzer'
+export const TESTER = 'team:tester'
 export const CONFIG_FILE = '.claude/tdd-guard.json'
 
-// frontend-team (elias-mods) has its own roles with the same split
-const IMPLEMENTERS = [UMSETZER, 'frontend-team:ui-ingenieur', 'frontend-team:logik-ingenieur', 'frontend-team:anbindungs-ingenieur']
-const TESTERS = [TESTER, 'frontend-team:test-ingenieur']
+// shortcut: team-delegate and frontend-team names stay until both are uninstalled everywhere, then drop them
+const IMPLEMENTERS = [
+  UMSETZER, 'team:ui-ingenieur', 'team:logik-ingenieur', 'team:anbindungs-ingenieur',
+  'team-delegate:umsetzer', 'frontend-team:ui-ingenieur', 'frontend-team:logik-ingenieur', 'frontend-team:anbindungs-ingenieur',
+]
+const TESTERS = [TESTER, 'team-delegate:tester', 'frontend-team:test-ingenieur']
 export const isImplementer = (agentType: string | undefined): boolean => IMPLEMENTERS.includes(agentType ?? '')
 const isTester = (agentType: string | undefined): boolean => TESTERS.includes(agentType ?? '')
 
@@ -129,11 +132,15 @@ export type GateInput = {
 const configReason = (): string =>
   `tdd-guard: ${CONFIG_FILE} ändert nur der Nutzer selbst. Ändere die Datei nicht und umgehe die Sperre nicht; bitte den Nutzer, sie bei Bedarf anzupassen.`
 
-// frontend-team calls its roles Ingenieur and CEO, team-delegate Umsetzer and Planer
-const rolesOf = (agentType: string | undefined) =>
-  agentType?.startsWith('frontend-team:')
-    ? { implementer: 'Ingenieur', tester: 'Test-Ingenieur', ofLead: 'des CEO', toLead: 'dem CEO', builder: 'ein Ingenieur' }
-    : { implementer: 'Umsetzer', tester: 'Tester', ofLead: 'des Planers', toLead: 'dem Planer', builder: 'der Umsetzer' }
+// engineers only work under the CEO (team level 2+), umsetzer and tester under planner or CEO
+const rolesOf = (agentType: string | undefined) => {
+  const type = agentType ?? ''
+  if (type.startsWith('frontend-team:') || type.endsWith('-ingenieur'))
+    return { implementer: 'Ingenieur', tester: 'Test-Ingenieur', ofLead: 'des CEO', toLead: 'dem CEO', builder: 'ein Ingenieur' }
+  if (type.startsWith('team:'))
+    return { implementer: 'Umsetzer', tester: 'Tester', ofLead: 'des Planers bzw. CEO', toLead: 'dem Planer bzw. CEO', builder: 'der Umsetzer oder ein Ingenieur' }
+  return { implementer: 'Umsetzer', tester: 'Tester', ofLead: 'des Planers', toLead: 'dem Planer', builder: 'der Umsetzer' }
+}
 
 const umsetzerReason = (rel: string, agentType: string | undefined): string => {
   const r = rolesOf(agentType)
@@ -338,9 +345,9 @@ export const plannerRules = (): string =>
     '- Ohne Test gehen: reine Dokumentation, Formatierung, Umbenennung, Einweg-Skripte. Lehnt die Sperre eine solche Änderung an Quellcode ab, frage den Nutzer.',
     '- Dein Bericht nennt: welcher Test, warum er rot war, dass er jetzt grün ist, und das Ergebnis der ganzen Suite.',
     'Rollen mit Tester und Umsetzer:',
-    `- Die roten Tests schreibst du selbst oder lässt sie vom Tester (${TESTER}) schreiben; prüfe in beiden Fällen selbst, dass sie aus dem richtigen Grund rot sind.`,
+    `- Die roten Tests schreibst du selbst oder lässt sie ab Team-Stufe 1 vom Tester (${TESTER}) schreiben; prüfe in beiden Fällen selbst, dass sie aus dem richtigen Grund rot sind.`,
     `- Den Umsetzer (${UMSETZER}) rufst du pro Aufruf mit einem roten Test auf: Pfad, Testname und Fehlermeldung, dazu die Zieldateien und der Auftrag "grün machen, keine Testdateien ändern". Danach prüfst du das Ergebnis selbst.`,
-    '- Im Frontend-Modus (frontend-team, du bist CEO) übernimmt frontend-team:test-ingenieur die Rolle des Testers und ui-, logik- und anbindungs-ingenieur die des Umsetzers; die Tests schreibst du dann nicht selbst.',
+    '- Ab Team-Stufe 2 (/team-2 bis /team-4, du bist CEO) schreibt nur team:tester die Tests und die Ingenieure (team:ui-, team:logik-, team:anbindungs-ingenieur, sonst team:umsetzer) den Code; selbst schreibst du dann keine Tests.',
     'Was erzwungen wird (nur in Git-Repositories):',
     '- Quellcode lässt sich erst ändern, wenn in der Arbeitskopie ein Test geändert oder neu ist. Der Umsetzer ändert keine Testdateien, der Tester keinen Quellcode, neue skip-/only-Marker werden abgelehnt, und Zug und Commit enden nur mit grüner Suite.',
     `- Abschalten kann nur der Nutzer, in ${CONFIG_FILE} mit {"enabled": false} oder über die Mod-Option mode. Ändere diese Datei nie selbst.`,

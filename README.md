@@ -7,11 +7,10 @@ Meine Mods für Claude Code, gebündelt als Marketplace. Jeder Eintrag ist ein e
 | Mod | Was er macht |
 | --- | --- |
 | [token-counter](token-counter/) | Dashboard über dem Prompt (Kontext, Limits, Planer vs. Umsetzer) mit Empfehlung, wann komprimiert oder gewechselt werden sollte |
-| [team-delegate](team-delegate/) | Planer mit Team: der Chat plant; Umsetzer, Tester, Reviewer, Sicherheitsprüfer und Sucher laufen als Subagenten |
+| [team](team/) | Team in Stufen, wählbar mit `/team-0` bis `/team-4`: 0 Allein, 1 Delegieren (Planer + Umsetzer, Standard), 2 Prüfen, 3 Design, 4 Voll (Claude als CEO, Ingenieure bauen test-first, Prüfer bewerten bis zur Zielnote). Ersetzt team-delegate und frontend-team |
 | [skills-collection](skills-collection/) | Skills: `performance-workflow` (schneller Code nach Messung), `test-first` (erst Test, dann Code) und `befehl-erklaeren` (Shell-Befehle Schritt für Schritt erklären) |
 | [tdd-guard](tdd-guard/) | Erzwingt Test-first in jedem Git-Projekt: Code erst nach rotem Test, der Umsetzer ändert keine Tests, Zug und Commit nur mit grüner Suite |
 | [lean-code](lean-code/) | Schlanker Code als Dauerregel (nach Ponytail): kleinste vollständige Änderung, kein ungefragter Code; Tests, Sicherheit und Validierung werden nie gekürzt. Gilt auch für den Umsetzer |
-| [frontend-team](frontend-team/) | Frontend-Team von Elias (aus `rethfeldelias/elias-mods`), hier mit Stufen: `/frontend leicht`, `design`, `voll` und `/frontend aus`. Der Chat ist CEO, Ingenieure bauen test-first, Prüfer bewerten bis zur Zielnote |
 
 ## Installation
 

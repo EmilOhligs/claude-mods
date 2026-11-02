@@ -370,7 +370,7 @@ test('the implementer suffix forbids editing tests', () => {
 })
 
 test('team-delegate roles keep their own names in refusals', () => {
-  const reason = gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'x\n', agentType: UMSETZER, hasTestChanges: true })
+  const reason = gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'x\n', agentType: 'team-delegate:umsetzer', hasTestChanges: true })
   expect(reason).toMatch(/Als Umsetzer .*des Planers/)
   expect(reason).not.toContain('CEO')
 })
@@ -381,6 +381,25 @@ test('the implementer suffix names the lead of the agent\'s own team', () => {
   expect(umsetzerSuffix(UMSETZER)).toContain('des Planers')
 })
 
-test('planner rules name the frontend-team roles for the CEO', () => {
-  expect(plannerRules()).toContain('frontend-team:test-ingenieur')
+test('planner rules name the team roles and the CEO from level 2', () => {
+  expect(plannerRules()).toContain('team:tester')
+  expect(plannerRules()).toContain('team:umsetzer')
+  expect(plannerRules()).toContain('Team-Stufe 2')
+  expect(plannerRules()).toContain('ab Team-Stufe 1')
+})
+
+test('team engineers may not edit tests and answer to the CEO', () => {
+  for (const agentType of ['team:ui-ingenieur', 'team:logik-ingenieur', 'team:anbindungs-ingenieur'])
+    expect(
+      gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'x\n', agentType, hasTestChanges: true }),
+    ).toMatch(/Als Ingenieur .*des CEO/)
+})
+
+test('the team implementer and tester answer to planner or CEO', () => {
+  expect(
+    gateDecision({ rel: 'tests/test_a.py', oldText: '', newText: 'x\n', agentType: 'team:umsetzer', hasTestChanges: true }),
+  ).toMatch(/Als Umsetzer .*des Planers bzw\. CEO/)
+  expect(
+    gateDecision({ rel: 'src/a.py', oldText: '', newText: 'x = 1\n', agentType: 'team:tester', hasTestChanges: true }),
+  ).toMatch(/Als Tester .*dem Planer bzw\. CEO/)
 })
