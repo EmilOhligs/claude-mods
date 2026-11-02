@@ -19,4 +19,7 @@ test('read-only agents get no rules, the implementer does', () => {
   expect(writesCode('Plan')).toBe(false)
   expect(writesCode('team-delegate:umsetzer')).toBe(true)
   expect(writesCode('general-purpose')).toBe(true)
+  for (const reviewer of ['team:reviewer', 'team:sicherheitspruefer', 'team:sucher', 'team:debugger', 'team:design', 'team:schlank-waechter'])
+    expect(writesCode(reviewer)).toBe(false)
+  for (const builder of ['team:umsetzer', 'team:tester', 'team:ui-ingenieur']) expect(writesCode(builder)).toBe(true)
 })

@@ -34,5 +34,9 @@ export const rules = (level: Exclude<Level, 'off'>): string =>
   ].join('\n')
 
 // Agenten, die keinen Code schreiben, bekommen die Regeln nicht.
-const READ_ONLY = new Set(['Explore', 'Plan', 'claude-code-guide', 'statusline-setup'])
+const READ_ONLY = new Set([
+  'Explore', 'Plan', 'claude-code-guide', 'statusline-setup',
+  // the team's reviewers and finder only read and judge
+  ...['reviewer', 'sicherheitspruefer', 'sucher', 'schlank-waechter', 'debugger', 'design', 'barrierefreiheit', 'datenschutz', 'performance', 'responsive', 'texte'].map(r => `team:${r}`),
+])
 export const writesCode = (agentType: string): boolean => !READ_ONLY.has(agentType)

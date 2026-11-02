@@ -5,7 +5,7 @@ Schlanker Code als Dauerregel: die kleinste vollständige Änderung, kein ungefr
 ## Was er tut
 
 - **`prompt.compose`:** hängt die Regeln an den System-Prompt jeder Session.
-- **`agent.spawn`:** hängt dieselben Regeln an den Auftrag jedes Subagenten, der Code schreiben kann, also auch an den Umsetzer von `team-delegate`. `Explore`, `Plan`, `claude-code-guide` und `statusline-setup` bleiben ausgenommen.
+- **`agent.spawn`:** hängt dieselben Regeln an den Auftrag jedes Subagenten, der Code schreiben kann, also auch an Umsetzer, Tester und Ingenieure von `team`. `Explore`, `Plan`, `claude-code-guide`, `statusline-setup` und die reinen Prüfer von `team` (Reviewer, Sicherheitsprüfer, Sucher, Schlank-Wächter, Debugger, Design und die übrigen) bleiben ausgenommen.
 
 Die Regeln: erst den Umfang klären (Aufrufer, Tests, Fixtures, Konfiguration), dann die erste Option nehmen, die vollständig funktioniert: weglassen, Vorhandenes nutzen, Standardbibliothek, installierte Abhängigkeit, eine Zeile, erst dann minimaler neuer Code. Am Ende jeder Codeänderung ein bis zwei Zeilen dazu, was weggelassen oder nicht geprüft wurde.
 

@@ -1,0 +1,91 @@
+{
+  "name": "team",
+  "version": "0.1.0",
+  "types": "./types/index.d.ts",
+  "description": "Team in Stufen 0 bis 4: allein, delegieren, mit Prüfern bis zur Zielnote. Ersetzt team-delegate und frontend-team",
+  "userConfig": {
+    "workerModel": {
+      "type": "string",
+      "title": "Umsetzer-Modell",
+      "description": "Model of the implementer agent",
+      "default": "sonnet",
+      "options": [
+        "haiku",
+        "sonnet",
+        "opus"
+      ]
+    },
+    "canEdit": {
+      "type": "boolean",
+      "title": "Umsetzer darf Dateien ändern",
+      "description": "Off: the implementer only reads and returns proposals",
+      "default": true
+    },
+    "targetScore": {
+      "type": "string",
+      "title": "Zielnote",
+      "description": "Mindestnote jedes Prüfers (von 10), damit eine Aufgabe als fertig gilt",
+      "default": "9",
+      "options": [
+        "7",
+        "8",
+        "9",
+        "10"
+      ]
+    },
+    "maxRounds": {
+      "type": "string",
+      "title": "Runden bis zur Rückfrage",
+      "description": "Nach so vielen Bau- und Prüfrunden hält das Team an und fragt den Menschen",
+      "default": "4",
+      "options": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    },
+    "showUiEvery": {
+      "type": "string",
+      "title": "Oberfläche zeigen alle … Runden",
+      "description": "So oft wird die Oberfläche dem Menschen zum Durchklicken gezeigt",
+      "default": "3",
+      "options": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    "reviewPrivacy": {
+      "type": "boolean",
+      "title": "Prüfer Datenschutz",
+      "description": "Zusätzlicher Prüfer für personenbezogene Daten in Oberfläche, Speicher und Logs",
+      "default": false
+    },
+    "reviewPerformance": {
+      "type": "boolean",
+      "title": "Prüfer Performance",
+      "description": "Zusätzlicher Prüfer für Ladezeit, Reaktionszeit und Bundle-Größe",
+      "default": false
+    },
+    "reviewResponsive": {
+      "type": "boolean",
+      "title": "Prüfer Responsive",
+      "description": "Zusätzlicher Prüfer für Handy, Tablet, Desktop und Browser",
+      "default": false
+    },
+    "reviewTexts": {
+      "type": "boolean",
+      "title": "Prüfer UX-Texte",
+      "description": "Zusätzlicher Prüfer für Beschriftungen, Fehlermeldungen und Tonfall",
+      "default": false
+    },
+    "reviewCode": {
+      "type": "boolean",
+      "title": "Prüfer Code-Review",
+      "description": "Zusätzlicher Prüfer für Struktur, Wartbarkeit und doppelten Code",
+      "default": false
+    }
+  }
+}

@@ -1,18 +1,18 @@
 # tdd-guard (Claude Code Mod) v0.1
 
-Test-first in jedem Git-Projekt: erst ein roter Test, dann der Code. Der Mod schreibt die Regeln in den System-Prompt und setzt sie mit Hooks durch. Er ist auf `team-delegate` abgestimmt: Der Planer schreibt die Tests, der Umsetzer macht sie grün.
+Test-first in jedem Git-Projekt: erst ein roter Test, dann der Code. Der Mod schreibt die Regeln in den System-Prompt und setzt sie mit Hooks durch. Er ist auf `team` abgestimmt: Planer oder CEO lassen die Tests schreiben, Umsetzer und Ingenieure machen sie grün.
 
 ## Was erzwungen wird
 
 Alles gilt nur in Git-Repositories.
 
 - **Code erst nach einem Test:** Eine Quelldatei lässt sich erst ändern, wenn in der Arbeitskopie eine Testdatei geändert oder neu ist. Ändert ein Shell-Befehl trotzdem Quellcode, wird die Änderung abgelehnt und mit `git stash` zurückgenommen (zurückholen mit `git stash pop`).
-- **Tests gehören dem Planer:** Der Umsetzer (`team-delegate:umsetzer`) darf keine Testdateien ändern, der Tester (`team-delegate:tester`) keinen Quellcode. Für `frontend-team` (elias-mods) gilt das genauso: `test-ingenieur` wie der Tester, `ui-`, `logik-` und `anbindungs-ingenieur` wie der Umsetzer.
+- **Tests gehören dem Planer:** Der Umsetzer (`team:umsetzer`) und die Ingenieure (`team:*-ingenieur`) dürfen keine Testdateien ändern, der Tester (`team:tester`) keinen Quellcode. Die alten Namen von team-delegate und frontend-team gelten übergangsweise mit. Für `frontend-team` (elias-mods) gilt das genauso: `test-ingenieur` wie der Tester, `ui-`, `logik-` und `anbindungs-ingenieur` wie der Umsetzer.
 - **Kein Wegschalten von Tests:** Neue `skip`-, `xfail`-, `only`- oder `ignore`-Marker werden abgelehnt (pytest, unittest, Jest/Vitest/Mocha, Go, Rust).
 - **Sofortige Rückmeldung:** Nach jeder Änderung an einer Testdatei läuft dieser Test, und Claude bekommt das Ergebnis (rot oder grün) samt Fehlermeldung zurück. Code-Dateien prüft zusätzlich der Linter, falls einer erkannt wurde.
-- **Zugende nur mit grüner Suite:** Gibt es Codeänderungen, laufen am Ende eines Zugs Tests und Linter. Sind sie rot, wird der Zug einmal angehalten. Das gilt für den Planer, den Umsetzer und die Ingenieure von `frontend-team`.
+- **Zugende nur mit grüner Suite:** Gibt es Codeänderungen, laufen am Ende eines Zugs Tests und Linter. Sind sie rot, wird der Zug einmal angehalten. Das gilt für den Planer, den Umsetzer und die Ingenieure von `team`.
 - **Commit nur mit grüner Suite:** Ein `git commit` geht nur durch, wenn Linter, Formatprüfung und Tests grün sind.
-- **Regeln für den Umsetzer:** Beim Start des Umsetzers (und der Ingenieure von `frontend-team`) hängt der Mod die Test-first-Regeln an dessen Auftrag an.
+- **Regeln für den Umsetzer:** Beim Start des Umsetzers (und der Ingenieure von `team`) hängt der Mod die Test-first-Regeln an dessen Auftrag an.
 - **Konfiguration geschützt:** Claude darf `.claude/tdd-guard.json` nicht ändern.
 
 ## Erkennung
@@ -54,7 +54,7 @@ Testdateien erkennt der Mod an typischen Namen wie `test_*.py`, `*_test.go`, `*.
 
 ## Zusammenspiel
 
-`team-delegate` stellt den Umsetzer. `token-counter` zeigt, wie sich der Verbrauch auf Planer und Umsetzer verteilt.
+`team` stellt Umsetzer, Tester und Ingenieure. `token-counter` zeigt, wie sich der Verbrauch auf Planer und Umsetzer verteilt.
 
 ## Offen
 - Echte Session 2026-10-24: Edit an Quellcode ohne geänderten Test wird abgelehnt (ok), aber eine Änderung per Shell (`sed -i`) geht durch. Die Sperre deckt Bash-Schreibzugriffe nicht ab.

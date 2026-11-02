@@ -34,6 +34,11 @@ test('recommend escalates by context and limits', () => {
   expect(recommend({ ...EMPTY, contextPercent: 92 }).level).toBe('alert')
   expect(recommend({ ...EMPTY, rateLimits: [{ kind: 'five_hour', percentUsed: 78 }] }).level).toBe('warn')
   expect(recommend({ ...EMPTY, rateLimits: [{ kind: 'five_hour', percentUsed: 95 }] }).text).toContain('5h')
+  for (const percentUsed of [78, 95]) {
+    const text = recommend({ ...EMPTY, rateLimits: [{ kind: 'five_hour', percentUsed }] }).text
+    expect(text).toContain('team:umsetzer')
+    expect(text).not.toContain('team-delegate')
+  }
 })
 
 test('recommend suggests delegating when opus does all the work', () => {

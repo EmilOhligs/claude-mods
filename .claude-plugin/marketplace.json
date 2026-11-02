@@ -9,10 +9,6 @@
       "source": "./token-counter"
     },
     {
-      "name": "team-delegate",
-      "source": "./team-delegate"
-    },
-    {
       "name": "skills-collection",
       "source": "./skills-collection"
     },
@@ -25,8 +21,8 @@
       "source": "./lean-code"
     },
     {
-      "name": "frontend-team",
-      "source": "./frontend-team"
+      "name": "team",
+      "source": "./team"
     }
   ]
 }
