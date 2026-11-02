@@ -24,7 +24,7 @@ test('mergeRuns folds a session into one run per role, newest first', () => {
     source: 'Claude Code (token-counter-Log)', status: 'ok',
     summary: '2 Turns, ↑2.0k ↓1.2k Tokens, opus-5-5, Session bisher $2.25',
   })
-  expect(runs[0]?.agent).toBe('Umsetzer (team-delegate)')
+  expect(runs[0]?.agent).toBe('Team (Claude Code)')
   expect(runs[0]?.summary).toBe('1 Turns, ↑1.0k ↓200 Tokens, opus-5-5')
 })
 

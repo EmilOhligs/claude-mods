@@ -32,7 +32,7 @@ export const mergeRuns = (logText: string, runs: Run[]): Run[] => {
       run: id,
       at: `${first.at.slice(0, 19)}Z`,
       project: runs.find(r => r.run === id)?.project ?? first.project,
-      agent: isMain ? 'Planer (Claude Code)' : 'Umsetzer (team-delegate)',
+      agent: isMain ? 'Planer (Claude Code)' : 'Team (Claude Code)',
       source: 'Claude Code (token-counter-Log)',
       status: 'ok',
       summary: `${sorted.length} Turns, ↑${fmt(read)} ↓${fmt(output)} Tokens, ${models}` +
